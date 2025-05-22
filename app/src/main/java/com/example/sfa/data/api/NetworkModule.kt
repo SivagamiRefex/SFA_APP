@@ -17,7 +17,7 @@ import javax.inject.Singleton
 object NetworkModule {
 
     const val baseUrl="http://47.29.120.55:81/"
-    const val baseUrlLumen="http://47.29.120.55:81/lumen-api/public/"
+    const val baseUrlLumen="http://47.29.120.55:81/lumen-test/public/"
     const val baseFileUrl="http://47.29.120.55:81/ProductCatalog/"
     const val baseImgUrl="http://47.29.120.55:81/SFA_App_Images/"
 
