@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "154201112393",
+    "project_id": "sfa-app-6599f",
+    "storage_bucket": "sfa-app-6599f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:154201112393:android:834e2d4537af7792eca498",
+        "android_client_info": {
+          "package_name": "com.example.sfa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSgjZpBvJmjLLLgft7mhBIyu4kHkQrZdA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="10dp"
+    android:layout_marginHorizontal="15dp"
+    android:layout_marginVertical="10dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/tv_assigned_to"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Salesperson Name"
+            android:padding="10dp"
+            android:textStyle="normal"
+            android:textSize="15sp"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+        <TextView
+            android:id="@+id/tv_task_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Task Name"
+            android:padding="10dp"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:layout_weight="1.8"
+            />
+            <ImageView
+                android:id="@+id/iv_preview"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_preview"
+                app:tint="@color/dark_blue"
+                android:layout_weight="0.2"/>
+        </LinearLayout>
+        <TextView
+            android:id="@+id/tv_customer_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Customer Name"
+            android:paddingHorizontal="10dp"
+            android:paddingBottom="10dp"
+            android:textStyle="normal"
+            android:textSize="15sp"
+            android:textColor="@color/black"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2.5">
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_calendar_month"
+                android:padding="10dp"
+                app:tint="@color/dark_blue"
+                android:layout_weight="0.5" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="1">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Completed"
+                    android:textColor="@color/dark_blue" />
+                <TextView
+                    android:id="@+id/tv_complete_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2025-05-13"
+                    android:layout_marginVertical="5dp"/>
+
+            </LinearLayout>
+            <Button
+                android:id="@+id/btn_mydayplan"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="Completed"
+                android:layout_marginEnd="5dp"
+                android:layout_weight="1"
+                android:visibility="visible"
+                android:backgroundTint="@color/green"/>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

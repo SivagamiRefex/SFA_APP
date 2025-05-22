@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/light_gray">
+
+    <include layout="@layout/layout_toolbar"
+        android:id="@+id/layoutToolbar"/>
+
+
+    <LinearLayout
+        android:id="@+id/ll_root"
+        android:layout_below="@+id/layoutToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/C10dp"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/tv_no_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:textSize="15sp"
+            android:text="No Data Available"
+            android:visibility="gone"
+            android:textColor="@color/black"/>
+        <GridView
+            android:id="@+id/gv_item"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:horizontalSpacing="20dp"
+            android:numColumns="2"
+            android:padding="5dp"
+            tools:listitem="@layout/item_customform_view"
+            android:verticalSpacing="20dp" />
+
+    </LinearLayout>
+    <!--  <include layout="@layout/layout_shimmer_order" />-->
+
+
+
+</RelativeLayout>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginTop="@dimen/C3dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+
+        android:weightSum="2">
+    <TextView
+        android:id="@+id/tv_first_letter"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="A"
+        android:textColor="@color/pink_color"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:background="@drawable/ic_circle"
+        android:layout_weight="0.20"/>
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Test person"
+            android:textSize="16sp"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1.5"
+            android:layout_gravity="center"
+            android:textColor="@color/black"/>
+        <TextView
+            android:id="@+id/tv_remove"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Remove"
+            android:textSize="12sp"
+            android:gravity="end"
+            android:textColor="@color/red"
+            android:layout_weight="0.3"/>
+
+    </LinearLayout>
+    <View
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/colorGrey"/>
+
+
+</LinearLayout>

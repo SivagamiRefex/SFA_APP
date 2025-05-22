@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="ref_blue">#2978b3</color>
+    <color name="ref_green">#7cc144</color>
+    <color name="ref_orange">#e7692c</color>
+    <color name="dark_blue">#2978b3</color><!--#0f4d92-->
+    <color name="old_dark_blue">#191ba6</color>
+
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+
+    <color name="ablack">#5E1C1C1C</color>
+
+    <color name="trans_bg">#40000000</color>
+    <color name="primary">#10adc2</color>
+    <color name="primary_light">#A1E4ED</color>
+    <color name="colorPrimaryDark">#10adc2</color>
+    <color name="colorAccent">#10adc2</color>
+    <color name="logo_color_code">#019cb0</color>
+    <color name="outline_col">#E6E6E6</color>
+    <color name="home_bg">#f9f9f9</color>
+    <color name="quantum_black_divider">#1f000000</color>
+    <color name="orange">#FFA500</color>
+    <color name="orange_expense">#fe920b</color>
+    <color name="blue_color">#11B0C6</color>
+    <color name="menu_color">#607d8b</color>
+
+    <color name="yellow">#F59E0B</color>
+    <color name="colorGrey">#dddddd</color>
+    <color name="light_gray">#ECECEC</color>
+    <color name="grey">#A39F9F</color>
+    <color name="login_text">#171717</color>
+    <color name="light_pink">#FDF2F8</color>
+    <color name="pink_color">#DB2777</color>
+
+    <color name="unproductive">#ff920b</color>
+    <color name="productive">#1ac0d6</color>
+
+    <color name="red">#F44336</color>
+
+    <color name="blue_start">#19bed4</color>
+    <color name="blue_mid">#10aec3</color>
+    <color name="blue_end">#079db1</color>
+    <color name="add_sub_bg">#f3fffe</color>
+
+    <color name="call_preview_text">#173aef</color>
+    <color name="call_preview_header_bg">#eae9e9</color>
+    <color name="call_preview_text_bg">#d7d7d7</color>
+    <color name="call_preview_header_text">#444444</color>
+    <color name="call_preview_text1">#666666</color>
+    <color name="call_preview_text2">#39ac08</color>
+    <color name="call_preview_text3">#7e0ca5</color>
+    <color name="call_preview_text4">#373737</color>
+    <color name="call_preview_header_line">#989898</color>
+
+    <color name="sec_text1">#272727</color>
+    <color name="sec_text2">#232323</color>
+    <color name="sec_header_bg">#35cbde</color>
+    <color name="map_circle">#7979ea</color>
+    <color name="map_color">#9CDBF4</color>
+
+    <color name="report_header">#008b8b</color>
+    <color name="light_report_header">#EBDBF1F1</color>
+    <color name="report_data">#577c7c</color>
+
+    <color name="report_van">#f6eeee</color>
+    <color name="report_van_card">#f1f1f1</color>
+
+
+    <color name="order_color_1_header">#8397c3</color>
+    <!--    <color name="order_color_1_header2">#7587AF</color>-->
+    <!--    <color name="order_color_1_body">#adbfdb</color>-->
+    <color name="order_color_1_body2">#D7DDE4</color>
+    <!--    <color name="order_color_1_body3">#B5BBC3</color>-->
+    <color name="call_preview_text2_1">#267504</color>
+    <!--    <color name="order_color_2_header">#b63e43</color>-->
+    <!--    <color name="order_color_2_body">#fef7ef</color>-->
+    <color name="bg_color_calls">#ebeeff</color>
+
+    <color name="background_color">#F5F5F5</color>
+    <color name="title_color">#10adc2</color>
+    <color name="text_color">#212121</color>
+    <color name="error_color">#D32F2F</color>
+    <color name="button_color">#10adc2</color>
+    <color name="button_text_color">#FFFFFF</color>
+
+
+
+    <color name="color_grey">#666666</color>
+    <color name="grey_1">#D1D1D1</color>
+    <color name="transparent">#00000000</color>
+
+    <color name="awhite">#A8FFFFFF</color>
+    <color name="grey_100">#F5F5F5</color>
+
+    <color name="light_purple">#F5F3FF</color>
+    <color name="light_yellow">#FFF7ED</color>
+    <color name="light_green">#F0FDF4</color>
+    <color name="light_blue">#F0F9FF</color>
+
+    <color name="green">#16A34A</color>
+    <color name="blue">#0891B2</color>
+    <color name="darkk_blue">#2563EB</color>
+    <color name="blue_light">#EFF6FF</color>
+    <color name="grey_300">#E0E0E0</color>
+    <color name="grey_400">#BDBDBD</color>
+    <color name="statuscolor">#716e6e</color>
+    <color name="grey_600">#757575</color>
+    <color name="grey_50">#FAFAFA</color>
+    <color name="background">#dddddd</color>
+    <color name="light_black">#251E1E</color>
+    <color name="light_red2">#FF7F7F</color>
+    <color name="light_red1">#fbd9d3</color>
+    <color name="light_red">#ffefea</color>
+</resources>

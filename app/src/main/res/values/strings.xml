@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">SFA</string>
+    <string name="login">Login</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="welcome">Welcome</string>
+    <string name="customer_name">Customer Name<font color='#F44336'>*</font></string>
+    <string name="enter_customer_name">Enter Customer Name</string>
+    <string name="address">Address</string>
+    <string name="enter_the_address">Enter the Address</string>
+    <string name="city">City</string>
+    <string name="enter_the_city">Enter the City</string>
+    <string name="phone">Phone/Mobile No.</string>
+    <string name="enter_the_phone_number">Enter the Phone/Mobile No.</string>
+    <string name="enter_the_email_id">Enter the Email Id</string>
+    <string name="enter_the_pan_number">Enter the PAN Card No.</string>
+    <string name="enter_the_gst_no">Enter the GST No.</string>
+    <string name="save">Save</string>
+    <string name="home">Home</string>
+    <string name="reports">Reports</string>
+    <string name="task_name">Task Name<font color='#F44336'>*</font></string>
+    <string name="salesperson_name">Salesperson Name<font color='#F44336'>*</font></string>
+    <string name="task_customer_name">Customer Name<font color='#F44336'>*</font></string>
+    <string name="task_start_date">Task Start Date<font color='#F44336'>*</font></string>
+    <string name="task_end_date">Task End Date<font color='#F44336'>*</font></string>
+    <string name="route_name">Route Name</string>
+    <string name="map_view">Map View</string>
+    <string name="check_in">Check-In</string>
+    <string name="check_out">Check-Out</string>
+    <string name="api_key">AIzaSyBn9eGybmgpvAp7MXbG1b1i1ODBo0YRruM</string>
+</resources>
