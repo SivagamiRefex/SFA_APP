@@ -1,8 +1,8 @@
-package com.example.sampleapp.model
+package com.example.sfa.data.model
 
 import com.google.gson.annotations.SerializedName
 
-data class CustomerDataViewModel(
+data class CustomerDataModel(
     @SerializedName("Cust_Id")
     var CustId: String? = null,
     @SerializedName("Cust_Name")

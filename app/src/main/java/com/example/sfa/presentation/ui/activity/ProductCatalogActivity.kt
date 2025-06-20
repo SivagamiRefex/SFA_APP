@@ -15,6 +15,7 @@ import com.example.sfa.databinding.ActivityProductCatalogBinding
 import com.example.sfa.presentation.ui.Adapter.FileViewAdapter
 import com.example.sfa.presentation.viewmodel.ProductCatalogViewModel
 import com.example.sfa.utils.Constant
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.Resource
 import com.example.sfa.utils.SecureStorage
 import com.example.sfa.utils.StringConstants
@@ -60,6 +61,7 @@ class ProductCatalogActivity:AppCompatActivity() {
         productCatalogViewmodel.getFileState.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
                         fileList= result.data.data!!
                         Toast.makeText(applicationContext, result.data.message, Toast.LENGTH_SHORT).show()
@@ -111,10 +113,12 @@ class ProductCatalogActivity:AppCompatActivity() {
                     }
                 }
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
                     Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                     showNoData()
                 }
                 is Resource.Loading -> {
+                    LoadingUtil.showLoading(this)
                     // Show loading indicator
                 }
 

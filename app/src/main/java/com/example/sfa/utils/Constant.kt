@@ -5,6 +5,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.location.Location
 import android.net.ConnectivityManager
+import android.os.BatteryManager
+import android.os.Build
+import android.provider.Settings
 import android.text.TextUtils
 import android.util.Log
 import android.util.Patterns
@@ -17,6 +20,8 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
+import java.time.DayOfWeek
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.Locale
 import kotlin.math.acos
@@ -212,6 +217,65 @@ object Constant {
         val year = calendar.get(Calendar.YEAR)
         return year
     }
+
+    fun getDeviceIdNew(context: Context): String {
+        return Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+    }
+
+    fun getBatteryPercentage(context: Context): Int {
+        val bm = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+        return bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+    }
+
+
+    fun getCurrentWeekStartAndEnd(): Pair<String, String> {
+        val calendar = Calendar.getInstance()
+        calendar.firstDayOfWeek = Calendar.MONDAY
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val startDate = calendar.time
+        calendar.add(Calendar.DATE, 6)
+        val endDate = calendar.time
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return Pair(sdf.format(startDate), sdf.format(endDate))
+    }
+
+
+    fun getCurrentMonthStartAndEnd(): Pair<String, String> {
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
+        val startDate = calendar.time
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+        val endDate = calendar.time
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return Pair(sdf.format(startDate), sdf.format(endDate))
+    }
+
+    fun getLastWeekStartAndEnd(): Pair<String, String> {
+        val calendar = Calendar.getInstance()
+        calendar.firstDayOfWeek = Calendar.MONDAY
+        calendar.add(Calendar.WEEK_OF_YEAR, -1)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val startDate = calendar.time
+        calendar.add(Calendar.DATE, 6)
+        val endDate = calendar.time
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return Pair(sdf.format(startDate), sdf.format(endDate))
+    }
+
+    fun getLastMonthStartAndEnd(): Pair<String, String> {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.MONTH, -1)
+        calendar.set(Calendar.DAY_OF_MONTH, 1)
+        val startDate = calendar.time
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+        val endDate = calendar.time
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return Pair(sdf.format(startDate), sdf.format(endDate))
+    }
+
+
+
+
 
 
 }

@@ -44,6 +44,10 @@ class AuthRepository @Inject constructor(
     suspend fun  saveCustomer(token:String,data:JsonObject)= safeApiCall {
         api.saveCustomer("Bearer $token",data)
     }
+
+    suspend fun  getCustomer(token:String,data:JsonObject)= safeApiCall {
+        api.getCustomer("Bearer $token",data)
+    }
     suspend fun  saveTask(token:String,data:JsonObject)= safeApiCall {
         api.saveTask("Bearer $token",data)
     }
@@ -128,6 +132,27 @@ class AuthRepository @Inject constructor(
 
     suspend fun saveFormAssignee(token:String,data:RequestBody,spId: String)= safeApiCall {
         api.saveFormAssignee("Bearer $token",data,spId)
+    }
+    suspend fun getTodayFollowupTask(token:String,spId: String,date: String,spType: Int)= safeApiCall {
+        api.getTodayFollowupTask("Bearer $token",spId,date,spType)
+    }
+    suspend fun getUpcomingFollowupTask(token:String,spId: String,date: String,spType: Int)= safeApiCall {
+        api.getUpcomingFollowupTask("Bearer $token",spId,date,spType)
+    }
+    suspend fun getPiechartCustData(token:String,spId: String,spType: Int,date: String,todate: String)= safeApiCall {
+        api.getPiechartCustData("Bearer $token",spId,spType,date,todate)
+    }
+
+    suspend fun getRepeatVisitCustList(token:String,spId: String,date: String,month: Int,year: Int)= safeApiCall {
+        api.getRepeatCustVisitList("Bearer $token",spId,date,month,year)
+    }
+
+    suspend fun saveLiveLoction(token:String,data:RequestBody,spId: String)= safeApiCall{
+        api.updateLocation("Bearer $token",data,spId)!!
+    }
+
+    suspend fun getLocTrackList(token:String,spId: String,date:String)= safeApiCall{
+        api.getLocationTrackList("Bearer $token",spId,date)!!
     }
 
 }

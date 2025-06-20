@@ -4,6 +4,8 @@ import android.app.DatePickerDialog
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -25,6 +27,7 @@ import com.example.sfa.presentation.ui.fragment.SelectionBottomSheetFragment
 import com.example.sfa.presentation.viewmodel.CustomerVisitViewModel
 import com.example.sfa.presentation.viewmodel.ReportVisitViewModel
 import com.example.sfa.utils.Constant
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.Resource
 import com.example.sfa.utils.SecureStorage
 import com.example.sfa.utils.StringConstants
@@ -82,7 +85,7 @@ class CustomerVisitReportActivity:AppCompatActivity() {
         spId = SecureStorage.getString(applicationContext, StringConstants.SP_ID).toString()
         spName = SecureStorage.getString(applicationContext,StringConstants.SP_NAME).toString()
         binding.tvSelectSp.text =spName
-        if (SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE)==2) {
+        if (SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE)==2||SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE)==3) {
             binding.llSp.visibility = View.VISIBLE
             //getSalesPersonList()
         } else {
@@ -189,53 +192,69 @@ class CustomerVisitReportActivity:AppCompatActivity() {
             dialog.show()
         })
 
-       /* visitViewmodel.getListState.observe(this) { result ->
+        visitViewmodel.getCustVisitState.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
+                        //Toast.makeText(requireContext(), "Today Followup Task List Updated", Toast.LENGTH_SHORT).show()
+                        visitList=result.data.data!!
+                        adapter.setCustomerList(visitList)
                         binding.rvReportData.visibility = View.VISIBLE
                         binding.tvNoData.visibility = View.GONE
-                        binding.llTotalDistance.visibility = View.VISIBLE
-                        visitList=result.data!!.data!!
-                        adapter.setCustomerList(visitList)
+                        binding.llTotalDistance.visibility = View.GONE
                         var distance: Double = 0.0
                         for (i in 0 until visitList.size - 1) {
                             val origin = visitList[i]
                             val destination = visitList[i + 1]
-                            val originLatLong = LatLng(origin.InLat.toDouble(), origin.InLong.toDouble())
-                            val destinationLatLong =
-                                LatLng(destination.InLat.toDouble(), destination.InLong.toDouble())
-                            distance += SphericalUtil.computeDistanceBetween(
-                                originLatLong,
-                                destinationLatLong
-                            );
+
+                            if(origin.InLat.toDouble()>0.0&&origin.InLong.toDouble()>0.0&&
+                                destination.InLat.toDouble()>0.0&&destination.InLong.toDouble()>0.0) {
+                                val originLatLong =
+                                    LatLng(origin.InLat.toDouble(), origin.InLong.toDouble())
+                                val destinationLatLong =
+                                    LatLng(
+                                        destination.InLat.toDouble(),
+                                        destination.InLong.toDouble()
+                                    )
+                                distance += SphericalUtil.computeDistanceBetween(originLatLong, destinationLatLong);
+                                if (distance > 0) {
+                                    binding.tvDistance.text =
+                                        String.format("%.2f", (distance / 1000)) + " km"
+                                }
+                            }
 
                         }
 
-                        if (distance > 0) {
-                            binding.tvDistance.text = String.format("%.2f", (distance / 1000)) + " km"
-                        }
+
+
 
                     } else {
                         visitList.clear()
+                        adapter.setCustomerList(visitList)
                         binding.rvReportData.visibility = View.GONE
                         binding.tvNoData.visibility = View.VISIBLE
                         binding.llTotalDistance.visibility = View.GONE
-                        Toast.makeText(this, "No Data Available", Toast.LENGTH_SHORT).show()
-                        adapter.setCustomerList(visitList)
                         Toast.makeText(applicationContext, result.data!!.message, Toast.LENGTH_SHORT).show()
                     }
                 }
+
                 is Resource.Error -> {
-                    Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
+                    LoadingUtil.hideLoading()
+                    visitList.clear()
+                    adapter.setCustomerList(visitList)
+                    binding.rvReportData.visibility = View.GONE
+                    binding.tvNoData.visibility = View.VISIBLE
+                    binding.llTotalDistance.visibility = View.GONE
+                    Toast.makeText(applicationContext, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
+
                 is Resource.Loading -> {
-                    // Show loading indicator
+                    LoadingUtil.showLoading(this)
                 }
 
             }
-        }*/
-
+        }
     }
 
     private fun prepareRecyclerView() {
@@ -257,7 +276,13 @@ class CustomerVisitReportActivity:AppCompatActivity() {
                 for (i in 0 until jsonArray.length()) {
 
                         val jsonObject = jsonArray.getJSONObject(i)
-                    if(!jsonObject.getString("Sp_Id").equals(SecureStorage.getString(applicationContext,StringConstants.SP_ID))) {
+                    //&& !jsonObject.getString("SP_Type").equals("3")
+                   // if(!jsonObject.getString("Sp_Id").equals(SecureStorage.getString(applicationContext,StringConstants.SP_ID))) {
+                    if((SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE)==2 &&
+                                !jsonObject.getString("SP_Type").equals("2")) ||
+                        (SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE)==3&&
+                                jsonObject.getString("Sp_Reporting_To_Id").equals
+                                    (SecureStorage.getString(applicationContext,StringConstants.SP_ID)))){
                         val selectionModel = SalesPersonModel(
                             jsonObject.getString("Sp_Id"),
                             jsonObject.getString("Sp_Name")
@@ -289,10 +314,11 @@ class CustomerVisitReportActivity:AppCompatActivity() {
     }
     suspend  fun getCustomerVisitList(){
         if(Constant.isNetworkAvailable(applicationContext)){
-            val result = visitViewmodel.getVisitList(SecureStorage.getString(applicationContext,com.example.sfa.utils.StringConstants.AUTH_TOKEN)!!,
+             visitViewmodel.getVisitList(SecureStorage.getString(applicationContext,com.example.sfa.utils.StringConstants.AUTH_TOKEN)!!,
            spId, currentFromDt,currentToDt)
-            when (result) {
+            /*when (result) {
                 is Resource.Success -> {
+                    LoadingUtil.hideLoading()
                     var json = JSONTokener(result.data!!.string()).nextValue()
                     var jsonArray = JSONArray()
 
@@ -363,19 +389,35 @@ class CustomerVisitReportActivity:AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                }
+                 }
                 }
 
                 is Resource.Error -> {
-                    // Log.e("SYNC", "$label sync failed: ${result.message}")
-                    // Toast.makeText(requireContext(), "$label failed: ${result.message}", Toast.LENGTH_SHORT).show()
+                    LoadingUtil.hideLoading()
+                    withContext(Dispatchers.Main) {
+
+                        visitList.clear()
+                        binding.rvReportData.visibility = View.GONE
+                        binding.tvNoData.visibility = View.VISIBLE
+                        binding.llTotalDistance.visibility = View.GONE
+                        adapter.setCustomerList(visitList)
 
 
+
+                    }
+                    Handler(Looper.getMainLooper()).post {
+
+                        Toast.makeText(this, "No Data Available", Toast.LENGTH_SHORT).show()
+                    }
 
                 }
 
+                is Resource.Loading -> {
+                    LoadingUtil.showLoading(this)
+                }
+
                 else -> {}
-            }
+            }*/
         }
     }
 

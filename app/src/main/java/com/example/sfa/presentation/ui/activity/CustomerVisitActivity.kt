@@ -20,6 +20,7 @@ import com.example.sfa.data.model.CheckInDataModel
 import com.example.sfa.databinding.ActivityCustomerVisitBinding
 import com.example.sfa.presentation.viewmodel.CustomerVisitViewModel
 import com.example.sfa.utils.Constant
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.LocationProvider
 import com.example.sfa.utils.PermissionUtil
 import com.example.sfa.utils.Resource
@@ -91,7 +92,7 @@ class CustomerVisitActivity:AppCompatActivity() {
 
                 if(Constant.getSetup("geofenc_need",0,dbController,this)==0) {
 
-                    val radius = 200.0
+                    val radius = 100.0
                     val meters: Double = Constant.meterDistanceBetweenPoints(
                         java.lang.Double.parseDouble(latitude), java.lang.Double.parseDouble(longitude),
                         Constant.getLatitude(clocation),
@@ -120,7 +121,7 @@ class CustomerVisitActivity:AppCompatActivity() {
                 builder.setCancelable(false)
                 builder.setPositiveButton("Ok") {
 
-                        dialog, which -> finish()
+                        dialog, which -> dialog.cancel()
                 }
                 val alertDialog = builder.create()
                 alertDialog.show()
@@ -144,18 +145,23 @@ class CustomerVisitActivity:AppCompatActivity() {
                 intent.putExtra("latitude",inLat)
                 intent.putExtra("longitude",inLong)
                 intent.putExtra("type",1)
+                intent.putExtra("from","visit")
+                intent.putExtra("checkInId",slNo)
                 startActivity(intent)
-                finish()
 
         }
 
         visitViewmodel.saveCheckInState.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
                         Toast.makeText(applicationContext, "Check-In Successfully", Toast.LENGTH_SHORT).show()
-                        finish()
+                        getTodayCheckInData()
+
+                        // finish()
                     } else {
+                        LoadingUtil.hideLoading()
                         Toast.makeText(applicationContext, result.data!!.message, Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -164,6 +170,7 @@ class CustomerVisitActivity:AppCompatActivity() {
                 }
                 is Resource.Loading -> {
                     // Show loading indicator
+                    LoadingUtil.showLoading(this)
                 }
 
             }
@@ -172,6 +179,7 @@ class CustomerVisitActivity:AppCompatActivity() {
         visitViewmodel.getTodayCheckIn.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
                         val checkinModel: CheckInDataModel = result.data.data!!
 
@@ -195,12 +203,13 @@ class CustomerVisitActivity:AppCompatActivity() {
                             binding.llCheckinTime.visibility= View.GONE
                             binding.cvHead.visibility=View.GONE
                         }
-                    } else {
+                    } /*else {
                         Toast.makeText(applicationContext, result.data!!.message, Toast.LENGTH_SHORT).show()
-                    }
+                    }*/
                 }
                 is Resource.Error -> {
-                    Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
+                    LoadingUtil.hideLoading()
+                    //Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                     binding.llCheckin.visibility = View.VISIBLE
                     binding.llCheckinTime.visibility= View.GONE
                     binding.cvHead.visibility=View.GONE
@@ -208,6 +217,7 @@ class CustomerVisitActivity:AppCompatActivity() {
                 }
                 is Resource.Loading -> {
                     // Show loading indicator
+                    LoadingUtil.showLoading(this)
                 }
 
             }
@@ -216,6 +226,7 @@ class CustomerVisitActivity:AppCompatActivity() {
         visitViewmodel.saveCheckOutState.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
                         Toast.makeText(applicationContext, "Check-Out Successfully", Toast.LENGTH_SHORT).show()
                         finish()
@@ -224,9 +235,11 @@ class CustomerVisitActivity:AppCompatActivity() {
                     }
                 }
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
                     Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Loading -> {
+                    LoadingUtil.showLoading(this)
                     // Show loading indicator
                 }
 
@@ -254,12 +267,12 @@ class CustomerVisitActivity:AppCompatActivity() {
                 e.printStackTrace()
             }
         } else {
-            Toast.makeText(applicationContext, "Source of Lead List not available", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, "Mydayplan data not available", Toast.LENGTH_SHORT).show()
         }
     }
 
     fun getCurrentLocation() {
-        Toast.makeText(applicationContext,"Permission Granted",Toast.LENGTH_SHORT).show()
+       // Toast.makeText(applicationContext,"Permission Granted",Toast.LENGTH_SHORT).show()
         if (!PermissionUtil.isLocationPermissionGranted(this)) {
             PermissionUtil.requestLocationPermission(this)
         }else {
@@ -324,7 +337,6 @@ class CustomerVisitActivity:AppCompatActivity() {
                 dialog, which ->
 
             saveCheckIn()
-            finish()
         }
         builder.setNegativeButton("No") {
 
@@ -375,7 +387,6 @@ class CustomerVisitActivity:AppCompatActivity() {
 
                                          dialog, which ->
                                                         saveCheckOut()
-                                                        finish()
         }
         builder.setNegativeButton("No") {
                                         dialog, which -> dialog.cancel()

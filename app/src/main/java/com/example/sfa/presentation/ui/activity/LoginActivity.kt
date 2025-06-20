@@ -19,6 +19,7 @@ import com.example.sfa.presentation.viewmodel.LoginViewModel
 import com.example.sfa.presentation.viewmodel.SetupDataViewModel
 import com.example.sfa.utils.Constant
 import com.example.sfa.utils.EmailValidator
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.LocationProvider
 import com.example.sfa.utils.PermissionUtil
 import com.example.sfa.utils.Resource
@@ -99,7 +100,7 @@ class LoginActivity: AppCompatActivity() {
         viewModel.loginState.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
-
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
                         SecureStorage.run {
                             setBoolean(applicationContext, StringConstants.IS_USER_LOGED_IN, true)
@@ -161,11 +162,13 @@ class LoginActivity: AppCompatActivity() {
                 }
 
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
                     Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
 
                 is Resource.Loading -> {
                     // Show loading indicator
+                    LoadingUtil.showLoading(this)
                 }
             }
         }
@@ -174,6 +177,7 @@ class LoginActivity: AppCompatActivity() {
         setupDataViewModel.setupDataState.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
+                    LoadingUtil.hideLoading()
                     val gson = Gson()
                     val jsonString = gson.toJson(result.data!!.data!!)
                     //Log.e("setup_data", "" + jsonString.toString())
@@ -185,10 +189,12 @@ class LoginActivity: AppCompatActivity() {
                 }
 
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
                     Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
 
                 is Resource.Loading -> {
+                    LoadingUtil.showLoading(this)
                     // Show loading indicator
                 }
 
@@ -266,7 +272,7 @@ class LoginActivity: AppCompatActivity() {
     }
 
     fun getCurrentLocation() {
-        Toast.makeText(applicationContext,"Permission Granted",Toast.LENGTH_SHORT).show()
+       // Toast.makeText(applicationContext,"Permission Granted",Toast.LENGTH_SHORT).show()
         if (!PermissionUtil.isLocationPermissionGranted(this)) {
             PermissionUtil.requestLocationPermission(this)
         }else {

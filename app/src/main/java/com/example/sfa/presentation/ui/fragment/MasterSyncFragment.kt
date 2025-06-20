@@ -19,6 +19,7 @@ import com.example.sfa.databinding.FragmentMastersyncBinding
 import com.example.sfa.presentation.ui.activity.MainActivity
 import com.example.sfa.presentation.viewmodel.MasterSyncViewModel
 import com.example.sfa.utils.Constant
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.Resource
 import com.example.sfa.utils.SecureStorage
 import com.example.sfa.utils.StringConstants
@@ -198,6 +199,7 @@ class MasterSyncFragment:Fragment() {
                 syncModel.axn, temp, spType, TimesUtil.getCurrentTime(TimesUtil.FORMAT1))
             when (result) {
                     is Resource.Success -> {
+                        LoadingUtil.hideLoading()
                         if(isAdded) {
                             try {
                                 var json = JSONTokener(result.data!!.string()).nextValue()
@@ -294,6 +296,7 @@ class MasterSyncFragment:Fragment() {
                                 Log.e("result success error", e.message.toString())
                             }
                         }
+
                     }
 
                     is Resource.Error -> {
@@ -317,7 +320,12 @@ class MasterSyncFragment:Fragment() {
                             })
                         }
 
+                        LoadingUtil.hideLoading()
+
                     }
+                is Resource.Loading -> {
+                    LoadingUtil.showLoading(requireContext())
+                }
 
                     else -> {}
             }

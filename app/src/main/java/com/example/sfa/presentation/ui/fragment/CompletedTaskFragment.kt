@@ -14,19 +14,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.sampleapp.sqlite.DBController
 import com.example.sfa.data.model.TaskModel
 import com.example.sfa.databinding.DialogCompleteTaskDetailBinding
-import com.example.sfa.databinding.DialogTaskDetailBinding
 import com.example.sfa.databinding.FragmentCompletedTaskBinding
-import com.example.sfa.databinding.FragmentPendingTaskBinding
 import com.example.sfa.presentation.ui.Adapter.CompleteTaskAdapter
-import com.example.sfa.presentation.ui.Adapter.PendingTaskAdapter
 import com.example.sfa.presentation.ui.listener.OnTaskClickListener
-import com.example.sfa.presentation.viewmodel.MydayplanViewModel
 import com.example.sfa.presentation.viewmodel.TaskViewModel
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.Resource
 import com.example.sfa.utils.SecureStorage
 import com.example.sfa.utils.StringConstants
 import com.example.sfa.utils.TimesUtil
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
 class CompletedTaskFragment: Fragment() {
@@ -56,9 +57,9 @@ class CompletedTaskFragment: Fragment() {
         taskViewModel.getctState.observe(requireActivity()) { result ->
             when (result) {
                 is Resource.Success -> {
-
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
-                        Toast.makeText(requireContext(), "Pending Task List Updated", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Completed Task List Updated", Toast.LENGTH_SHORT).show()
                         taskList= result.data.data!!
                         completeTaskAdapter.setList(taskList)
                         // checkSwitchPlanNd(taskList)
@@ -70,10 +71,12 @@ class CompletedTaskFragment: Fragment() {
                 }
 
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
                     Toast.makeText(requireContext(), result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
 
                 is Resource.Loading -> {
+                    LoadingUtil.showLoading(requireContext())
                     // Show loading indicator
                 }
 
@@ -112,6 +115,27 @@ class CompletedTaskFragment: Fragment() {
         binding.tvCustomerAddr.text=selectionModel.custAddress
         binding.tvTaskDetails.text = selectionModel.taskDetail
         binding.tvCompleteDate.text=selectionModel.completeDt
+        binding.tvCheckInTime.text=selectionModel.checkInTime
+        binding.tvCheckOutTime.text=selectionModel.checkOutTime
+        binding.tvTotalDuration.text=getTotalInTime(selectionModel.checkInTime,selectionModel.checkOutTime)
         dialog.show()
+    }
+
+    private fun getTotalInTime(InTime: String?, outTime: String?): String {
+        val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS", Locale.getDefault())
+        return try {
+            val date1 = format.parse(InTime ?: "") ?: return "-"
+            val date2 = format.parse(outTime ?: "") ?: return "-"
+            val diff = date2.time - date1.time
+
+            val hours = TimeUnit.MILLISECONDS.toHours(diff)
+            val minutes = TimeUnit.MILLISECONDS.toMinutes(diff) % 60
+            val seconds = TimeUnit.MILLISECONDS.toSeconds(diff) % 60
+
+            String.format("%02d:%02d:%02d", hours, minutes, seconds)
+        } catch (e: ParseException) {
+            e.printStackTrace()
+            "-"
+        }
     }
 }

@@ -22,6 +22,7 @@ import com.example.sfa.data.model.CustomDynamicDataModel
 import com.example.sfa.databinding.ActivityFormResponseViewReportBinding
 import com.example.sfa.databinding.ActivityFormResponsesBinding
 import com.example.sfa.presentation.viewmodel.FormViewModel
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.Resource
 import com.example.sfa.utils.SecureStorage
 import dagger.hilt.android.AndroidEntryPoint
@@ -91,6 +92,7 @@ class FormResponseViewActivity:AppCompatActivity() {
             SecureStorage.getString(applicationContext,com.example.sfa.utils.StringConstants.SP_ID)!!)
         when (result) {
             is Resource.Success -> {
+                LoadingUtil.hideLoading()
                 var json = JSONTokener(result.data!!.string()).nextValue()
                 var jsonArray = JSONArray()
 
@@ -118,8 +120,13 @@ class FormResponseViewActivity:AppCompatActivity() {
                 }
             }
             is Resource.Error -> {
+                LoadingUtil.hideLoading()
                 binding.tvNoData.visibility = View.VISIBLE
                 binding.tvNoData.visibility = View.GONE
+
+            }
+            is Resource.Loading -> {
+              LoadingUtil.showLoading(this)
 
             }
             else -> {}

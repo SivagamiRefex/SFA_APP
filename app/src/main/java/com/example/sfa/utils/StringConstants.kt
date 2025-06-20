@@ -27,6 +27,11 @@ object StringConstants {
     val IS_FIRST_TIME_SYNC_ALL="isfirsttimesyncall"
     val PLANNED_VISIT_CUSTOMER_DATA="planned_visit_customer_data"
     val MYDAYPLAN_DATA="mydayplan_data"
+    val USER_LATITUDE: String = "kLatitudeKey"
+    val USER_LONGITUDE: String = "kLongitudeKey"
+    val USER_ACCURACY: String = "kUserAccuracyKey"
+    val USER_BEARING: String = "kUserBearingKey"
+    val USER_SPEED: String = "kUserSpeedKey"
 
 
 

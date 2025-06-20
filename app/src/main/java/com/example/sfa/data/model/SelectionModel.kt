@@ -12,4 +12,5 @@ data class SelectionModel(
     var selectedSite:String?=null
     var selectedSitesList: List<String> = mutableListOf()
     var planNo:Int=0
+    var email=""
 }

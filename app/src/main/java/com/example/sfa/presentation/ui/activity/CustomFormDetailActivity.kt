@@ -56,6 +56,7 @@ import com.example.sfa.databinding.ActivityCustomformDetailBinding
 import com.example.sfa.presentation.viewmodel.FormViewModel
 import com.example.sfa.presentation.viewmodel.ImageUploadViewModel
 import com.example.sfa.utils.Constant
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.Resource
 import com.example.sfa.utils.SecureStorage
 import com.example.sfa.utils.StringConstants
@@ -117,6 +118,9 @@ class CustomFormDetailActivity:AppCompatActivity() {
     var custId=""
     var type=""
     var customerLabel:String="Customer"
+    var screenType=0
+    var screenFrom="visit"
+    var checkInId="0"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCustomformDetailBinding.inflate(layoutInflater)
@@ -143,6 +147,15 @@ class CustomFormDetailActivity:AppCompatActivity() {
         if (intent.hasExtra("custId")) {
             custId = intent.getStringExtra("custId")!!
         }
+        if (intent.hasExtra("screenType")) {
+            screenType = intent.getIntExtra("screenType", 0)
+        }
+        if (intent.hasExtra("screenFrom")) {
+            screenFrom = intent.getStringExtra("screenFrom")!!
+        }
+        if (intent.hasExtra("checkInId")) {
+            checkInId = intent.getStringExtra("checkInId")!!
+        }
 
         binding.layoutToolbar.tvTitle.text=title
         customerLabel = Constant.getSetup("customer_label","Customer",dbController,this)!!
@@ -151,7 +164,7 @@ class CustomFormDetailActivity:AppCompatActivity() {
         binding.tvAddrLabel.text="$customerLabel Address"
         binding.tvContactLabel.text="$customerLabel Contact No"
 
-        if(!custId.equals("")){
+        if(screenType==1){
             binding.cvCustomerDetail.visibility= View.VISIBLE
             getCustomerDetail(custId)
         }else{
@@ -312,11 +325,15 @@ class CustomFormDetailActivity:AppCompatActivity() {
                         } else {
                             Toast.makeText(applicationContext, result.data!!.message, Toast.LENGTH_SHORT).show()
                         }
+                        LoadingUtil.hideLoading()
+
                     }
                     is Resource.Error -> {
+                        LoadingUtil.hideLoading()
                         Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                     }
                     is Resource.Loading -> {
+                        LoadingUtil.showLoading(this)
                         // Show loading indicator
                     }
 
@@ -327,6 +344,7 @@ class CustomFormDetailActivity:AppCompatActivity() {
             formViewModel.saveCustomformState.observe(this) { result ->
                 when (result) {
                     is Resource.Success -> {
+                        LoadingUtil.hideLoading()
 
                         if (result.data!!.status) {
                             Toast.makeText(applicationContext, result.data!!.message, Toast.LENGTH_SHORT).show()
@@ -339,11 +357,15 @@ class CustomFormDetailActivity:AppCompatActivity() {
                     }
 
                     is Resource.Error -> {
+                        LoadingUtil.hideLoading()
+
                         Toast.makeText(applicationContext, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                     }
 
                     is Resource.Loading -> {
                         // Show loading indicator
+                        LoadingUtil.showLoading(this)
+
                     }
 
                 }
@@ -403,6 +425,8 @@ class CustomFormDetailActivity:AppCompatActivity() {
             SecureStorage.getString(applicationContext,com.example.sfa.utils.StringConstants.SP_ID)!!,moduleId)
         when (result) {
             is Resource.Success -> {
+                LoadingUtil.hideLoading()
+
                 var json = JSONTokener(result.data!!.string()).nextValue()
                 var jsonArray = JSONArray()
 
@@ -418,6 +442,7 @@ class CustomFormDetailActivity:AppCompatActivity() {
 
                         withContext(Dispatchers.Main) {
                             loadData(array, jsonArray)
+
                         }
 
                     } else {
@@ -429,9 +454,13 @@ class CustomFormDetailActivity:AppCompatActivity() {
                 }
             }
             is Resource.Error -> {
+                LoadingUtil.hideLoading()
                 binding.tvNoData.visibility = View.VISIBLE
                 binding.tvNoData.visibility = View.GONE
 
+            }is Resource.Loading -> {
+
+             LoadingUtil.showLoading(this)
             }
             else -> {}
         }
@@ -610,8 +639,11 @@ class CustomFormDetailActivity:AppCompatActivity() {
                                 val mandate = jsonObject.getInt("Mandate")
                                 val flag = jsonObject.getInt("flag")
                                 val tableName = jsonObject.getString("FGTableName")
-
-                                binding.btnSubmit!!.visibility = View.VISIBLE
+                                if(screenType==1) {
+                                    binding.btnSubmit!!.visibility = View.VISIBLE
+                                }else{
+                                    binding.btnSubmit!!.visibility = View.GONE
+                                }
 
                                 // Handle the edittext for text/phone number
                                 if (typeToAdd.contains("TA") || typeToAdd == "N" || typeToAdd == "NP" ||
@@ -713,7 +745,13 @@ class CustomFormDetailActivity:AppCompatActivity() {
 
                                     // Put the EditText inside CardView
                                     card.addView(editText)
-
+                                    if(screenType==1) {
+                                        editText.isEnabled=true
+                                        editText.hint="Enter the data"
+                                    }else{
+                                        editText.isEnabled=false
+                                        editText.hint=""
+                                    }
                                     store_list.add(dynamicDataModel)
                                     binding.llDynamicData.addView(textView)
                                     binding.llDynamicData.addView(card)
@@ -911,6 +949,7 @@ class CustomFormDetailActivity:AppCompatActivity() {
                                     layout.addView(toDate)
 
                                     card.addView(layout)
+
                                     binding.llDynamicData.addView(textView)
                                     binding.llDynamicData.addView(card)
                                 }
@@ -1009,6 +1048,7 @@ class CustomFormDetailActivity:AppCompatActivity() {
 
                                     layout.addView(fromDate)
                                     card.addView(layout)
+
                                     binding.llDynamicData.addView(textView)
                                     binding.llDynamicData.addView(card)
                                 }
@@ -1283,7 +1323,7 @@ class CustomFormDetailActivity:AppCompatActivity() {
                                     layout.addView(toDate)
 
                                     // Put the TextView inside CardView
-                                    card.addView(layout)
+
                                     binding.llDynamicData.addView(textView)
                                     binding.llDynamicData.addView(card)
                                 }
@@ -1391,6 +1431,7 @@ class CustomFormDetailActivity:AppCompatActivity() {
 
                                     // Put the TextView inside CardView
                                     card.addView(layout)
+
                                     binding.llDynamicData.addView(textView)
                                     binding.llDynamicData.addView(card)
                                 }
@@ -1720,6 +1761,7 @@ class CustomFormDetailActivity:AppCompatActivity() {
 
                                     // Add the card view and text view to the layout
                                     card.addView(checkBoxContainer)
+
                                     binding.llDynamicData.addView(textView)
                                     binding.llDynamicData.addView(card)
                                 }
@@ -1866,6 +1908,12 @@ class CustomFormDetailActivity:AppCompatActivity() {
                                     // Add views to layout
                                     binding.llDynamicData.addView(textView)
                                     binding.llDynamicData.addView(layout)
+
+                                    if(screenType==1){
+                                        imageview.isEnabled=true
+                                    }else{
+                                        imageview.isEnabled=false
+                                    }
                                 }
 
 
@@ -1930,6 +1978,7 @@ class CustomFormDetailActivity:AppCompatActivity() {
             activityReportAppObject.addProperty("eKey", currentScreenTimeStamp)
             activityReportAppObject.addProperty("custCode", custId)
             activityReportAppObject.addProperty("currenttime", currenttime)
+            activityReportAppObject.addProperty("checkInId", checkInId)
             val jsonObject1 = JsonObject()
             jsonObject1.add("common_dynamic_data", activityReportAppObject)
             jsonArray.add(jsonObject1)

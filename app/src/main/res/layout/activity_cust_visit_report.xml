@@ -180,6 +180,19 @@
                 android:paddingEnd="3dp"
                 />
         </LinearLayout>
+        <TextView
+            android:id="@+id/tv_activity_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Activity Status"
+            android:textSize="20sp"
+            android:layout_weight="1"
+            android:gravity="start"
+            android:textStyle="bold"
+            android:paddingEnd="3dp"
+            android:layout_below="@+id/ll_report_label2"
+            android:background="@color/light_gray"
+            />
 
         <TextView
             android:id="@+id/tv_no_data"
@@ -189,7 +202,7 @@
             android:textColor="@color/black"
             android:textStyle="bold"
             android:gravity="center"
-            android:layout_below="@+id/ll_report_label2"
+            android:layout_below="@+id/tv_activity_status"
             android:textSize="18sp"
             android:layout_marginTop="10dp"
             android:visibility="gone"/>

@@ -1,0 +1,54 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_margin="@dimen/C10dp">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select the Month and Year"
+        android:textColor="@color/dark_blue"
+        android:gravity="center"
+        android:textSize="@dimen/C18dp"
+        android:textStyle="bold"
+        android:layout_marginHorizontal="10dp" />
+    <Button
+        android:id="@+id/btn_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Show All"
+        android:layout_marginTop="@dimen/C10dp"
+        android:layout_marginVertical="@dimen/C10dp"
+        android:layout_gravity="end"
+        android:layout_marginEnd="10dp"
+        android:visibility="gone"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+    <NumberPicker
+        android:id="@+id/monthPicker"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="@dimen/C10dp"/>
+
+    <NumberPicker
+        android:id="@+id/yearPicker"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/C10dp"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnOk"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="OK"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/C10dp"/>
+</LinearLayout>

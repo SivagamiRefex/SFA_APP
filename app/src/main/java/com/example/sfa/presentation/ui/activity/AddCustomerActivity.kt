@@ -17,6 +17,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.lifecycleScope
 import com.example.sampleapp.sqlite.DBController
 import com.example.sfa.R
 import com.example.sfa.data.model.SelectionModel
@@ -27,6 +28,7 @@ import com.example.sfa.presentation.viewmodel.CustomerViewModel
 import com.example.sfa.presentation.viewmodel.LoginViewModel
 import com.example.sfa.utils.Constant
 import com.example.sfa.utils.EmailValidator
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.LocationProvider
 import com.example.sfa.utils.PermissionUtil
 import com.example.sfa.utils.Resource
@@ -37,8 +39,13 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONException
+import org.json.JSONObject
+import org.json.JSONTokener
 import java.util.Locale
 @AndroidEntryPoint
 class AddCustomerActivity:AppCompatActivity() {
@@ -47,7 +54,7 @@ class AddCustomerActivity:AppCompatActivity() {
     private val custViewModel: CustomerViewModel by viewModels()
     lateinit var dbController: DBController
     private  var sourceList=ArrayList<SelectionModel>()
-    var sourceOfLeadId:String=""
+    var sourceOfLeadId:String="0"
     var sourceOfLeadName:String=""
     var customerLabel:String="Customer"
     var geoAddress:String=""
@@ -75,7 +82,7 @@ class AddCustomerActivity:AppCompatActivity() {
         getSourceOfLeadList()
         getCurrentLocation()
         binding.cvSourceOfLead.setOnClickListener{
-             SelectionBottomSheetFragment(title = "Select a Person", itemList = sourceList) {
+             SelectionBottomSheetFragment(title = "Select the Source", itemList = sourceList) {
                  selected ->
                         binding.tvSourceOfLead.text=selected.name
                         sourceOfLeadId=selected.id
@@ -118,11 +125,13 @@ class AddCustomerActivity:AppCompatActivity() {
                 Toast.makeText(applicationContext, "Enter $customerLabel City", Toast.LENGTH_LONG).show()
             }else if(binding.etPhone.text.toString() == ""){
                 Toast.makeText(applicationContext, "Enter $customerLabel Phone", Toast.LENGTH_LONG).show()
+            }else if(!isValidPhoneNumber(binding.etPhone.text.toString())){
+                Toast.makeText(applicationContext, "Enter Valid Phone Number", Toast.LENGTH_LONG).show()
             }
             // else if(etEmail.text.toString() == ""){
             //    Toast.makeText(context, "Enter $customerLabel Email", Toast.LENGTH_LONG).show()
             // }
-             else if(!EmailValidator.isValid(binding.etEmail.text.toString())) {
+             else if(!binding.etEmail.text.toString().equals("")&&!EmailValidator.isValid(binding.etEmail.text.toString())) {
                 Toast.makeText(applicationContext, "Enter Valid $customerLabel Email", Toast.LENGTH_LONG).show()
              }
             //else if(etOrganization.text.toString() == ""){
@@ -142,7 +151,7 @@ class AddCustomerActivity:AppCompatActivity() {
         custViewModel.saveCustState.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
-
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
                         Toast.makeText(applicationContext, "$customerLabel Saved Successfully", Toast.LENGTH_SHORT).show()
                        /* val gson = Gson()
@@ -150,7 +159,9 @@ class AddCustomerActivity:AppCompatActivity() {
                         if (!dbController.updateProduct(StringConstants.CUSTOMER_DATA, jsonString.toString())) {
                             dbController.addProduct(StringConstants.CUSTOMER_DATA, jsonString.toString())
                         }*/
-                        finish()
+                        lifecycleScope.launch {
+                            getCustomer()
+                        }
                     } else {
                         Toast.makeText(applicationContext, result.data!!.message, Toast.LENGTH_SHORT).show()
                     }
@@ -159,11 +170,12 @@ class AddCustomerActivity:AppCompatActivity() {
                 }
 
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
                     Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
 
                 is Resource.Loading -> {
-                    // Show loading indicator
+                    LoadingUtil.showLoading(this)
                 }
 
             }
@@ -172,7 +184,7 @@ class AddCustomerActivity:AppCompatActivity() {
 
     }
     fun getCurrentLocation() {
-        Toast.makeText(applicationContext,"Permission Granted",Toast.LENGTH_SHORT).show()
+       // Toast.makeText(applicationContext,"Permission Granted",Toast.LENGTH_SHORT).show()
         if (!PermissionUtil.isLocationPermissionGranted(this)) {
             PermissionUtil.requestLocationPermission(this)
         }else {
@@ -303,6 +315,73 @@ class AddCustomerActivity:AppCompatActivity() {
 
         }
     }
+
+     suspend  fun getCustomer(){
+
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("spName", SecureStorage.getString(applicationContext, StringConstants.SP_NAME))
+        jsonObject.addProperty("spType",SecureStorage.getInt(applicationContext, StringConstants.SP_TYPE) )
+        jsonObject.addProperty("spId", SecureStorage.getString(applicationContext, StringConstants.SP_ID))
+
+         Log.e("customer data", "" + jsonObject.toString())
+        val result = custViewModel.getCustomer(SecureStorage.getString(applicationContext,StringConstants.AUTH_TOKEN)!!,jsonObject)
+        when (result) {
+            is Resource.Success -> {
+                LoadingUtil.hideLoading()
+
+                try {
+                    var json = JSONTokener(result.data!!.string()).nextValue()
+                    var jsonArray = JSONArray()
+                    if (json is JSONObject) {
+                        if (json.getBoolean("status")) {
+                            if (json is JSONObject) {
+                                jsonArray = json.getJSONArray("data")
+                                //withContext(Dispatchers.Main) {
+
+                                    if (!dbController.updateProduct(
+                                            StringConstants.CUSTOMER_DATA,
+                                            jsonArray.toString()
+                                        )
+                                    ) {
+                                        dbController.addProduct(
+                                            StringConstants.CUSTOMER_DATA,
+                                            jsonArray.toString()
+                                        )
+                                    }
+                                finish()
+
+                                // }
+
+                            }
+                        }
+                    }
+                }catch (e:Exception){
+                    Toast.makeText(applicationContext,"Error: "+e.message,Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            is Resource.Error -> {
+                LoadingUtil.hideLoading()
+
+            }
+            is Resource.Loading -> {
+                LoadingUtil.showLoading(applicationContext)
+            }
+
+            else -> {}
+        }
+     }
+    private fun isValidPhoneNumber(mobileNum: String): Boolean{
+            if(mobileNum.equals("0000000000")||mobileNum.get(0).toString().equals("0"))
+            {
+                return false
+            }else if(mobileNum.length == 10 && android.util.Patterns.PHONE.matcher(mobileNum).matches() ) {
+                return true
+            }else {
+                return false
+            }
+    }
+
 
 
 

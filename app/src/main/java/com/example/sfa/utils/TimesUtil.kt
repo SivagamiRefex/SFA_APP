@@ -5,6 +5,7 @@ import android.content.Context
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -255,6 +256,12 @@ object TimesUtil {
         val strDate = dateFormat.format(calendar.time)
         SecureStorage.setString(applicationContext,StringConstants.LOGIN_DATE,strDate)
 
+    }
+    fun isFirstDateBeforeSecond(firstDate: String, secondDate: String): Boolean {
+        val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        val date1 = sdf.parse(firstDate)
+        val date2 = sdf.parse(secondDate)
+        return date1.before(date2)
     }
 
 

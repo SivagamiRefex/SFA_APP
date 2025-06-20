@@ -107,7 +107,7 @@
                     android:id="@+id/tv_assign_site"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Assign To Site  "
+                    android:text="Assign To Customer  "
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     android:textStyle="normal"

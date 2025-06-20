@@ -29,7 +29,7 @@
                     android:text="Customer Visit Details"
                     android:padding="10dp"
                     android:textSize="18sp"
-                    android:textColor="@color/green"
+                    android:textColor="@color/dark_blue"
                     android:drawableEnd="@drawable/ic_arrow_right"/>
                 <View
                     android:layout_marginTop="5dp"
@@ -44,7 +44,7 @@
                     android:text="Customer Visit with Map View"
                     android:padding="10dp"
                     android:textSize="18sp"
-                    android:textColor="@color/green"
+                    android:textColor="@color/dark_blue"
                     android:drawableEnd="@drawable/ic_arrow_right"/>
                 <View
                     android:layout_marginTop="5dp"
@@ -69,12 +69,29 @@
                     android:background="@color/light_purple"/>
 
                 <TextView
+                    android:id="@+id/tv_repeat_cust_visit"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text=""
+                    android:text="Repeated Customer Visit Detail"
                     android:padding="10dp"
                     android:textSize="18sp"
-                    android:textColor="@color/black"/>
+                    android:textColor="@color/dark_blue"
+                    android:drawableEnd="@drawable/ic_arrow_right"/>
+                <View
+                    android:layout_marginTop="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/light_purple"/>
+
+                <TextView
+                    android:id="@+id/tv_salesperson_loc_track"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Sales Person Location Track Report"
+                    android:padding="10dp"
+                    android:textSize="18sp"
+                    android:textColor="@color/dark_blue"
+                    android:drawableEnd="@drawable/ic_arrow_right"/>
                 <View
                     android:layout_marginTop="5dp"
                     android:layout_width="match_parent"

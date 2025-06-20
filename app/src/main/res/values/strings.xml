@@ -6,11 +6,11 @@
     <string name="welcome">Welcome</string>
     <string name="customer_name">Customer Name<font color='#F44336'>*</font></string>
     <string name="enter_customer_name">Enter Customer Name</string>
-    <string name="address">Address</string>
+    <string name="address">Address<font color='#F44336'>*</font></string>
     <string name="enter_the_address">Enter the Address</string>
-    <string name="city">City</string>
+    <string name="city">City<font color='#F44336'>*</font></string>
     <string name="enter_the_city">Enter the City</string>
-    <string name="phone">Phone/Mobile No.</string>
+    <string name="phone">Phone/Mobile No.<font color='#F44336'>*</font></string>
     <string name="enter_the_phone_number">Enter the Phone/Mobile No.</string>
     <string name="enter_the_email_id">Enter the Email Id</string>
     <string name="enter_the_pan_number">Enter the PAN Card No.</string>
@@ -18,7 +18,7 @@
     <string name="save">Save</string>
     <string name="home">Home</string>
     <string name="reports">Reports</string>
-    <string name="task_name">Task Name<font color='#F44336'>*</font></string>
+    <string name="task_name">Task Title<font color='#F44336'>*</font></string>
     <string name="salesperson_name">Salesperson Name<font color='#F44336'>*</font></string>
     <string name="task_customer_name">Customer Name<font color='#F44336'>*</font></string>
     <string name="task_start_date">Task Start Date<font color='#F44336'>*</font></string>
@@ -28,4 +28,13 @@
     <string name="check_in">Check-In</string>
     <string name="check_out">Check-Out</string>
     <string name="api_key">AIzaSyBn9eGybmgpvAp7MXbG1b1i1ODBo0YRruM</string>
+
+    <string-array name="Activity">
+            <item>Today</item>
+            <item>This Week</item>
+            <item>This Month</item>
+            <item>Last Week</item>
+            <item>Last Month</item>
+            <item>Custom Range</item>
+    </string-array>
 </resources>

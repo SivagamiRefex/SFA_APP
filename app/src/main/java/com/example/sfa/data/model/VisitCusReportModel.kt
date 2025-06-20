@@ -8,5 +8,6 @@ data class VisitCusReportModel(
     @SerializedName("InTime") val InTime : String,
     @SerializedName("outTime") val outTime : String,
     @SerializedName("InLat") val InLat : String,
-    @SerializedName("InLong") val InLong : String
+    @SerializedName("InLong") val InLong : String,
+    @SerializedName("is_activity_complete") val isActivityComplete : Int=0
 )

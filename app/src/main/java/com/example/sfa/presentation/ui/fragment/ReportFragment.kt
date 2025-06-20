@@ -13,6 +13,8 @@ import com.example.sfa.databinding.FragmentMenuBinding
 import com.example.sfa.databinding.FragmentReportBinding
 import com.example.sfa.presentation.ui.activity.CustVisitMapReportActivity
 import com.example.sfa.presentation.ui.activity.CustomerVisitReportActivity
+import com.example.sfa.presentation.ui.activity.reports.RepeatCustomerVisitReportActivity
+import com.example.sfa.presentation.ui.activity.reports.SpLocTrackReportActivity
 import com.example.sfa.utils.Constant
 
 class ReportFragment : Fragment() {
@@ -68,6 +70,15 @@ class ReportFragment : Fragment() {
        /* binding.tvCustomFormDataView.setOnClickListener {
             startActivity(Intent(context, CustomFormViewReportActivity::class.java))
         }*/
+        binding.tvRepeatCustVisit.setOnClickListener{
+            startActivity(Intent(context, RepeatCustomerVisitReportActivity::class.java))
+
+        }
+
+        binding.tvSalespersonLocTrack.setOnClickListener{
+            startActivity(Intent(context, SpLocTrackReportActivity::class.java))
+
+        }
     }
 
     override fun onDestroyView() {

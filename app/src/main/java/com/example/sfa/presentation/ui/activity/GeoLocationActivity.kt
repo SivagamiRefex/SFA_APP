@@ -35,6 +35,7 @@ import com.example.sfa.databinding.ActivityGeoLocationBinding
 import com.example.sfa.presentation.viewmodel.CustomerVisitViewModel
 import com.example.sfa.presentation.viewmodel.RouteViewModel
 import com.example.sfa.utils.Constant
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.LocationProvider
 import com.example.sfa.utils.PermissionUtil
 import com.example.sfa.utils.Resource
@@ -123,6 +124,7 @@ class GeoLocationActivity:AppCompatActivity(), OnMapReadyCallback {
         visitViewmodel.saveCheckInState.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
                         Toast.makeText(applicationContext, "Check-In Successfully", Toast.LENGTH_SHORT).show()
                         finish()
@@ -132,10 +134,12 @@ class GeoLocationActivity:AppCompatActivity(), OnMapReadyCallback {
                 }
 
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
                     Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
 
                 is Resource.Loading -> {
+                    LoadingUtil.showLoading(this)
                     // Show loading indicator
                 }
 
@@ -150,7 +154,7 @@ class GeoLocationActivity:AppCompatActivity(), OnMapReadyCallback {
     }
 
     fun getContinuousCurrentLocation() {
-        Toast.makeText(applicationContext,"Permission Granted", Toast.LENGTH_SHORT).show()
+       // Toast.makeText(applicationContext,"Permission Granted", Toast.LENGTH_SHORT).show()
         if (!PermissionUtil.isLocationPermissionGranted(this)) {
             PermissionUtil.requestLocationPermission(this)
         }else {

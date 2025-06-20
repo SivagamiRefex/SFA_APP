@@ -12,10 +12,13 @@ import com.example.sfa.R
 import com.example.sfa.data.model.SelectionModel
 import com.example.sfa.databinding.ActivityAddcustomerBinding
 import com.example.sfa.databinding.ActivityTaskCreationBinding
+import com.example.sfa.presentation.ui.fragment.AddCustomerDialogFragment
 import com.example.sfa.presentation.ui.fragment.SelectionBottomSheetFragment
+import com.example.sfa.presentation.ui.listener.OnCustomerAddedListener
 import com.example.sfa.presentation.viewmodel.CustomerViewModel
 import com.example.sfa.presentation.viewmodel.TaskViewModel
 import com.example.sfa.utils.Constant
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.Resource
 import com.example.sfa.utils.SecureStorage
 import com.example.sfa.utils.StringConstants
@@ -36,6 +39,8 @@ class TaskCreationActivity:AppCompatActivity() {
     private  var routeList=ArrayList<SelectionModel>()
     var salespersonId:String=""
     var salespersonName:String=""
+    var salespersonEmail:String=""
+
     var customerId:String=""
     var customerName:String=""
     var routeId:String=""
@@ -47,6 +52,7 @@ class TaskCreationActivity:AppCompatActivity() {
     var  currentDt:String=""
     var  startDate:String=""
     var  endDate:String=""
+    var followUpDate=""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +72,8 @@ class TaskCreationActivity:AppCompatActivity() {
         currentDt = TimesUtil.getCurrentTime(TimesUtil.FORMAT1)
         startDate = TimesUtil.getCurrentTime(TimesUtil.FORMAT1)
         endDate = TimesUtil.getCurrentTime(TimesUtil.FORMAT1)
+        //followUpDate = TimesUtil.getCurrentTime(TimesUtil.FORMAT1)
+
         binding.tvStartDate.text = startDate
         binding.tvEndDte.text = endDate
         binding.layoutToolbar.tvTitle.text="Task Creation"
@@ -73,10 +81,20 @@ class TaskCreationActivity:AppCompatActivity() {
         binding.layoutToolbar.menubtn.setOnClickListener {
             this.onBackPressed()
         }
-        binding.cvRoute.setOnClickListener {
+
+        if((SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE)==1)){
+            binding.tvSalesperson.text =SecureStorage.getString(applicationContext,StringConstants.SP_NAME)!!
+            salespersonId = SecureStorage.getString(applicationContext,StringConstants.SP_ID)!!
+            salespersonName = SecureStorage.getString(applicationContext,StringConstants.SP_NAME)!!
+            salespersonEmail=SecureStorage.getString(applicationContext,StringConstants.SP_EMAIL)!!
+            binding.cvSalesperson.isEnabled=false
+        }else{
+            binding.cvSalesperson.isEnabled=true
+        }
+        binding.tvRoute.setOnClickListener {
             try {
 
-                Log.e("cvroute","route1")
+               // Log.e("cvroute","route1")
                 SelectionBottomSheetFragment(
                     title = "Select a Route",
                     itemList = routeList
@@ -94,6 +112,7 @@ class TaskCreationActivity:AppCompatActivity() {
             }catch (e:Exception){
                 Log.e("route error:",e.message.toString())
             }
+            //Log.e("on click","route selected")
         }
         binding.cvSalesperson.setOnClickListener {
             SelectionBottomSheetFragment(
@@ -103,9 +122,11 @@ class TaskCreationActivity:AppCompatActivity() {
                 binding.tvSalesperson.text = selected.name
                 salespersonId = selected.id
                 salespersonName = selected.name
+                salespersonEmail=selected.email
                 Toast.makeText(applicationContext, "Selected: ${selected.name}", Toast.LENGTH_SHORT)
                     .show()
             }.show(supportFragmentManager, "MySelectionSheet")
+
         }
         binding.cvCustomer.setOnClickListener {
             SelectionBottomSheetFragment(
@@ -206,6 +227,54 @@ class TaskCreationActivity:AppCompatActivity() {
             dialog.show()
         })
 
+
+        binding.tvFollowupDate.setOnClickListener(View.OnClickListener {
+            val day: Int
+            val month: Int
+            val year: Int
+            if (binding.tvFollowupDate.getText().toString() != "") {
+                val dateArray: Array<String> =
+                    binding.tvFollowupDate.getText().toString().split("-".toRegex())
+                        .dropLastWhile { it.isEmpty() }.toTypedArray()
+                year = dateArray[0].toInt()
+                month = dateArray[1].toInt() - 1
+                day = dateArray[2].toInt()
+            } else {
+                val c = Calendar.getInstance()
+
+                day = c[Calendar.MONTH]
+                month = c[Calendar.MONTH]
+                year = c[Calendar.YEAR]
+            }
+            val dialog = DatePickerDialog(
+                this,
+                { view, year, month, dayOfMonth ->
+                    val _year = year.toString()
+                    val _month = if ((month + 1) < 10) "0" + (month + 1) else (month + 1).toString()
+                    val _date = if (dayOfMonth < 10) "0$dayOfMonth" else dayOfMonth.toString()
+                    val _pickedDate = "$year-$_month-$_date"
+                    Log.e("PickedDate: ", "Date: $_pickedDate") //2019-02-12
+                    followUpDate = _pickedDate // _date +"/"+_month+"/"+_year;
+                    binding.tvFollowupDate.setText(followUpDate)
+                }, year, month, day
+            )
+            // dialog.datePicker.maxDate = System.currentTimeMillis() - 1000
+            if (binding.tvEndDte.getText().toString() != "") {
+                val dateArray: Array<String> =
+                    binding.tvEndDte.getText().toString().split("-".toRegex())
+                        .dropLastWhile { it.isEmpty() }.toTypedArray()
+                val syear = dateArray[0].toInt()
+                val smonth = dateArray[1].toInt()
+                val sday = dateArray[2].toInt()+1
+                val mCalendar = Calendar.getInstance()
+                mCalendar.set(syear, smonth - 1, sday)
+                dialog.datePicker.minDate = mCalendar.timeInMillis
+
+            }
+
+            dialog.show()
+        })
+
         binding.btnCreateTask.setOnClickListener {
             if (binding.etTask.text.toString() == "") {
                 Toast.makeText(applicationContext, "Enter Task Name", Toast.LENGTH_LONG).show()
@@ -220,10 +289,21 @@ class TaskCreationActivity:AppCompatActivity() {
 
         }
 
+        binding.tvAddCustomer.setOnClickListener{
+            val dialog = AddCustomerDialogFragment()
+            dialog.setOnCustomerAddedListener(object: OnCustomerAddedListener {
+                override fun onCustomerAdded() {
+                    getCustomerList()
+                }
+            })
+            dialog.show(supportFragmentManager, "AddCustomerDialog")
+
+        }
+
         taskViewModel.saveTaskState.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
-
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
                         Toast.makeText(applicationContext, "Task Created Successfully", Toast.LENGTH_SHORT).show()
                         finish()
@@ -234,10 +314,12 @@ class TaskCreationActivity:AppCompatActivity() {
                 }
 
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
                     Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
 
                 is Resource.Loading -> {
+                    LoadingUtil.showLoading(this)
                     // Show loading indicator
                 }
 
@@ -256,11 +338,20 @@ class TaskCreationActivity:AppCompatActivity() {
 
                 for (i in 0 until jsonArray.length()) {
                     val jsonObject = jsonArray.getJSONObject(i)
-
-                    if(!jsonObject.getString("Sp_Id").equals(SecureStorage.getString(applicationContext,StringConstants.SP_ID))){
+//&&!jsonObject.getString("SP_Type").equals("3")
+                    if((SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE)==2 &&
+                                !jsonObject.getString("SP_Type").equals("2")) ||
+                        (SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE)==3&&
+                                (jsonObject.getString("Sp_Reporting_To_Id").equals(
+                                    SecureStorage.getString(applicationContext,StringConstants.SP_ID))||
+                                        SecureStorage.getString(applicationContext,StringConstants.SP_ID).
+                                        equals(jsonObject.getString("Sp_Id"))))){
                         val selectionModel: SelectionModel = SelectionModel(
                         jsonObject.getString("Sp_Id"),
                         jsonObject.getString("Sp_Name"))
+
+                        selectionModel.email=jsonObject.getString("Sp_Email")
+
                         salespersonList.add(selectionModel)
 
                     }
@@ -335,6 +426,7 @@ class TaskCreationActivity:AppCompatActivity() {
             jsonObject.addProperty("taskName", binding.etTask.text.toString())
             jsonObject.addProperty("assignedToId",salespersonId)
             jsonObject.addProperty("assignedToName",salespersonName)
+            jsonObject.addProperty("assignedToEmail",salespersonEmail)
             jsonObject.addProperty("routeId",routeId)
             jsonObject.addProperty("routeName",routeName)
             jsonObject.addProperty("customerId",customerId)
@@ -344,6 +436,8 @@ class TaskCreationActivity:AppCompatActivity() {
             jsonObject.addProperty("CustomerLong", longitude)
             jsonObject.addProperty("startDate", startDate)
             jsonObject.addProperty("endDate", endDate)
+            jsonObject.addProperty("followUpDate", followUpDate)
+
             jsonObject.addProperty("taskDetail", binding.etTaskDetail.text.toString())
             jsonObject.addProperty("createdDate", TimesUtil.getCurrentTime(TimesUtil.FORMAT))
             jsonObject.addProperty("assignedById", SecureStorage.getString(applicationContext, StringConstants.SP_ID))

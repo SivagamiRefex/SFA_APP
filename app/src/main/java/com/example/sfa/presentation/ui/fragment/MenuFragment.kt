@@ -12,12 +12,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.sampleapp.sqlite.DBController
 import com.example.sfa.databinding.FragmentMenuBinding
+import com.example.sfa.presentation.service.LocationService
 import com.example.sfa.presentation.ui.activity.AddCustomerActivity
 import com.example.sfa.presentation.ui.activity.AddRouteActivity
 import com.example.sfa.presentation.ui.activity.AssignFormActivity
 import com.example.sfa.presentation.ui.activity.LoginActivity
 import com.example.sfa.presentation.viewmodel.LogoutViewModel
 import com.example.sfa.presentation.viewmodel.TaskViewModel
+import com.example.sfa.utils.AlarmUtils
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.Resource
 import com.example.sfa.utils.SecureStorage
 import com.example.sfa.utils.StringConstants
@@ -46,6 +49,13 @@ class MenuFragment: Fragment() {
 
     fun initView(view:View){
         dbController=DBController(requireContext())
+
+        if((SecureStorage.getInt(requireContext(),StringConstants.SP_TYPE)!!)==1){
+            menuBinding.cvAssignForm.visibility=View.GONE
+        }else{
+            menuBinding.cvAssignForm.visibility=View.VISIBLE
+
+        }
         menuBinding.cvAddCustomer.setOnClickListener(){
              val intent = Intent(context, AddCustomerActivity::class.java)
              startActivity(intent)
@@ -85,19 +95,25 @@ class MenuFragment: Fragment() {
                         Toast.makeText(requireContext(), "User Logout Successfully", Toast.LENGTH_SHORT).show()
                         SecureStorage.clearAll(requireContext())
                         dbController.clearDatabase(DBController.TABLE_NAME);
+                        AlarmUtils.cancelAlarm(requireContext())
+                        requireContext().stopService(Intent(requireContext(), LocationService::class.java))
                         requireActivity().finish()
                         val intent = Intent(context, LoginActivity::class.java)
                         startActivity(intent)
                     } else {
                         Toast.makeText(requireContext(), result.data!!.message, Toast.LENGTH_SHORT).show()
                     }
+                    LoadingUtil.hideLoading()
+
                 }
 
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
                     Toast.makeText(requireContext(), result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
 
                 is Resource.Loading -> {
+                    LoadingUtil.showLoading(requireContext())
                     // Show loading indicator
                 }
 

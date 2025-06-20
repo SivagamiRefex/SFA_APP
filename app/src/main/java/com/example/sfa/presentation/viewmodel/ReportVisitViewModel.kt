@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sfa.data.model.BaseResponse
+import com.example.sfa.data.model.RepeatCustVisitModel
 import com.example.sfa.data.model.TaskModel
 import com.example.sfa.data.model.VisitCusReportModel
 import com.example.sfa.data.model.VisitCustLatLngRepModel
@@ -26,6 +27,12 @@ class ReportVisitViewModel  @Inject constructor(
     private val _getMapListState = MutableLiveData<Resource<BaseResponse<ArrayList<VisitCustLatLngRepModel>>>>()
     val getMapListState: LiveData<Resource<BaseResponse<ArrayList<VisitCustLatLngRepModel>>>> = _getMapListState
 
+    private val _getCustVisitState = MutableLiveData<Resource<BaseResponse<ArrayList<VisitCusReportModel>>>>()
+    val getCustVisitState: LiveData<Resource<BaseResponse<ArrayList<VisitCusReportModel>>>> = _getCustVisitState
+
+    private val _getRepeatCustVisitState = MutableLiveData<Resource<BaseResponse<ArrayList<RepeatCustVisitModel>>>>()
+    val getRepeatCustVisitState: LiveData<Resource<BaseResponse<ArrayList<RepeatCustVisitModel>>>> = _getRepeatCustVisitState
+
     fun getMapVisitList(token: String,spId:String,fromdate: String){
         viewModelScope.launch {
             _getMapListState.value = Resource.Loading()
@@ -36,9 +43,30 @@ class ReportVisitViewModel  @Inject constructor(
         }
     }
 
-     suspend fun getVisitList(
+   /* suspend fun getVisitList(
         token: String,spId:String,fromdate: String,todate:String
     ): Resource<ResponseBody> {
         return repository.getVisitCustList(token, spId, fromdate, todate)
+    }*/
+
+    fun getRepeatCustVisit(token: String,spId:String,date: String,month: Int,year: Int){
+        viewModelScope.launch {
+            _getRepeatCustVisitState.value = Resource.Loading()
+            val result = repository.getRepeatVisitCustList(token,spId,date,month,year)
+            _getRepeatCustVisitState.value = result
+
+
+        }
     }
+    fun getVisitList( token: String,spId:String,fromdate: String,todate:String){
+        viewModelScope.launch {
+            _getCustVisitState.value = Resource.Loading()
+            val result = repository.getVisitCustList(token, spId, fromdate, todate)
+            _getCustVisitState.value = result
+
+
+        }
+    }
+
+
 }

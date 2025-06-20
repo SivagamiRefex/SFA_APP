@@ -40,6 +40,13 @@ class VisitCustReportAdapter : RecyclerView.Adapter<VisitCustReportAdapter.ViewH
                 tvOuttime.text = "-"
                 tvTottime.text = "-"
             }
+
+            if(item.isActivityComplete>0){
+               tvActivityStatus.text="Completed"
+            }else{
+                tvActivityStatus.text="Not Completed"
+
+            }
         }
     }
 

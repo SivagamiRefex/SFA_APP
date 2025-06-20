@@ -8,13 +8,17 @@ import com.example.sfa.data.model.CustomModuleDataModel
 import com.example.sfa.data.model.CustomerModel
 import com.example.sfa.data.model.FileModel
 import com.example.sfa.data.model.FormResponsesListModel
+import com.example.sfa.data.model.LocationTrackModel
 import com.example.sfa.data.model.LoginRequest
 import com.example.sfa.data.model.LoginResponse
 import com.example.sfa.data.model.MydayPlanModel
+import com.example.sfa.data.model.PiechartDataModel
+import com.example.sfa.data.model.RepeatCustVisitModel
 import com.example.sfa.data.model.SetupDataResponse
 import com.example.sfa.data.model.TaskModel
 import com.example.sfa.data.model.VisitCusReportModel
 import com.example.sfa.data.model.VisitCustLatLngRepModel
+import com.example.sfa.presentation.viewmodel.LocationTrackViewModel
 import com.google.firebase.inappmessaging.internal.ApiClient
 import com.google.gson.JsonObject
 import okhttp3.MultipartBody
@@ -63,6 +67,9 @@ interface ApiService {
     @FormUrlEncoded
     suspend fun saveCustomer(@Header("Authorization") token: String, @Field("data") data:JsonObject): Response<BaseRespWithoutData>
 
+    @POST("getcustomer")
+    suspend fun getCustomer(@Header("Authorization") token: String, @Body data:JsonObject):Response<ResponseBody>
+
     @POST("savetask")
     @FormUrlEncoded
     suspend fun saveTask(@Header("Authorization") token: String, @Field("data") data:JsonObject): Response<BaseRespWithoutData>
@@ -109,7 +116,7 @@ interface ApiService {
     suspend fun getVisitCustomerList(@Header("Authorization") token: String,
                              @Query("Sp_Id") spId:String,
                              @Query("FromDate") fromdate:String,
-                             @Query("ToDate") todate:String):Response<ResponseBody>
+                             @Query("ToDate") todate:String):Response<BaseResponse<ArrayList<VisitCusReportModel>>>
     @POST("getvisitcustmaplist")
     suspend fun getVisitCustLatLngList(@Header("Authorization") token: String,
                                @Query("Sp_Id") spId:String,
@@ -164,4 +171,33 @@ interface ApiService {
                                       @Part("data") data: RequestBody?,
                                       @Query("Sp_Id") spId: String?)
     : Response<BaseRespWithoutData>
+
+
+    @POST("gettodayfollowuptask")
+    suspend fun getTodayFollowupTask(@Header("Authorization") token: String, @Query("spId") id: String, @Query("date") date: String, @Query("spType") type: Int): Response<BaseResponse<ArrayList<TaskModel>>>
+
+    @POST("getupcomingfollowuptask")
+    suspend fun getUpcomingFollowupTask(@Header("Authorization") token: String, @Query("spId") id: String, @Query("date") date: String, @Query("spType") type: Int): Response<BaseResponse<ArrayList<TaskModel>>>
+
+
+    @POST("getpiechartcustdata")
+    suspend fun getPiechartCustData(@Header("Authorization") token: String, @Query("spId") id: String, @Query("spType") type: Int, @Query("date") date: String, @Query("todate") todate: String): Response<BaseResponse<PiechartDataModel>>
+
+    @POST("getrepeatvisitcustlist")
+    suspend fun getRepeatCustVisitList(@Header("Authorization") token: String,
+                                       @Query("spId") spId:String,
+                                       @Query("date") fromdate:String,
+                                       @Query("month") month:Int,
+                                       @Query("year") year:Int):Response<BaseResponse<ArrayList<RepeatCustVisitModel>>>
+
+
+    @Multipart
+    @POST("updatelivelocation")
+    suspend fun updateLocation(@Header("Authorization") token: String,@Part("data") data: RequestBody?, @Query("spId") sfCode: String,
+    ):  Response<BaseRespWithoutData>
+
+    @POST("getloctracklist")
+    suspend fun getLocationTrackList(@Header("Authorization") token: String,
+                             @Query("Sp_Id") spId:String,
+                             @Query("Date") fromdate:String): Response<BaseResponse<ArrayList<LocationTrackModel>>>
 }

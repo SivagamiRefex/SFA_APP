@@ -5,15 +5,17 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.location.Location
 import android.util.Log
+import com.example.sfa.utils.TimesUtil
 
 class DBController(context: Context):SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     companion object{
         private val DATABASE_NAME = "dbSynMaster"
-        private val DATABASE_VERSION = 1
+        private val DATABASE_VERSION = 2
         val TABLE_NAME = "tblSynMaster"
         private val columnName: String = "columnName" // column name
-        private val ID: String = "ID" // auto generated ID column
+        val ID: String = "ID" // auto generated ID column
         const val columnValue: String = "columnValue" // column value
         const val TABLE_ORDER: String = "table_order"
         const val DATA_KEY: String = "dataKey" // column name
@@ -26,6 +28,15 @@ class DBController(context: Context):SQLiteOpenHelper(context, DATABASE_NAME, nu
         const val ALL_ORDER: Int = 3
         const val TABLE_IMAGE: String = "table_image"
         const val IMAGE_PATH: String = "imagePath"
+        const val TABLE_LOCATION: String = "table_location"
+        const val Latitude: String = "column_latitude"
+        const val Longitude: String = "column_longitude"
+        const val Time: String = "column_time"
+        const val Address: String = "column_address"
+        const val Accuracy: String = "column_accuracy"
+        const val Speed: String = "column_speed"
+        const val Bearing: String = "column_bearing"
+        const val CurrentTime: String = "column_current_time"
 
 // column name
     }
@@ -46,6 +57,13 @@ class DBController(context: Context):SQLiteOpenHelper(context, DATABASE_NAME, nu
         if (db != null) {
             db.execSQL(audioQuery)
         }
+
+        val locationQuery =
+            ("CREATE TABLE IF NOT EXISTS " + TABLE_LOCATION + "(" + ID + " integer primary key, " + Latitude + " text, " + Longitude + " text, "
+                    + Time + " text, " + Address + " text, " + Accuracy + " text, " + Speed + " text, " + Bearing + " text, " + DBController.IS_UPDATED_TO_SERVER + " text, " + CurrentTime + " text " + ")")
+        if (db != null) {
+            db.execSQL(locationQuery)
+        }
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -57,6 +75,9 @@ class DBController(context: Context):SQLiteOpenHelper(context, DATABASE_NAME, nu
 
         query = "DROP TABLE IF EXISTS " + DBController.TABLE_IMAGE
         db?.execSQL(query)
+
+        db?.execSQL("DROP TABLE IF EXISTS " + TABLE_LOCATION)
+        onCreate(db)
 
 
     }
@@ -277,6 +298,79 @@ class DBController(context: Context):SQLiteOpenHelper(context, DATABASE_NAME, nu
 
         // return contact list
         return productList
+    }
+
+    fun getAllLocationData(isNeedUpdated: Boolean): ArrayList<HashMap<String, String>> {
+        val locationList = ArrayList<HashMap<String, String>>()
+        val database = this.writableDatabase
+        val cursor = database.rawQuery("SELECT * FROM " + TABLE_LOCATION, null)
+        if (cursor.moveToFirst()) {
+            do {
+                if (!isNeedUpdated || cursor.getString(8) == "0") {
+                    val map = HashMap<String, String>()
+                    map[ID] = cursor.getString(0)
+                    map[Latitude] = cursor.getString(1)
+                    map[Longitude] = cursor.getString(2)
+                    map[Time] = cursor.getString(3)
+                    map[Address] = cursor.getString(4)
+                    map[Accuracy] = cursor.getString(5)
+                    map[Speed] = cursor.getString(6)
+                    map[Bearing] = cursor.getString(7)
+                    map[CurrentTime] = cursor.getString(9)
+                    locationList.add(map)
+                }
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        database.close()
+
+        // return contact list
+        return locationList
+    }
+
+    fun addLocation(location: Location, isUpdatedToServer: String?, address: String?): Boolean {
+        try {
+            val db = this.writableDatabase
+            val cv = ContentValues()
+            cv.put(Latitude, location.latitude.toString())
+            cv.put(Longitude, location.longitude.toString())
+            cv.put(Time, location.time.toString())
+            cv.put(Address, address)
+            cv.put(Accuracy, location.accuracy.toString())
+            cv.put(Speed, location.speed.toString())
+            cv.put(Bearing, location.bearing.toString())
+            cv.put(DBController.IS_UPDATED_TO_SERVER, isUpdatedToServer)
+            cv.put(CurrentTime, TimesUtil.getCurrentTime(TimesUtil.FORMAT))
+
+            val value = db.insert(TABLE_LOCATION, null, cv)
+
+            Log.e("database", "addLocation: value $value")
+
+            //            db.close();
+            return true
+        } catch (ex: java.lang.Exception) {
+            ex.printStackTrace()
+            return false
+        }
+    }
+
+    fun updateLocation(id: String): Boolean {
+        try {
+            val db = this.writableDatabase
+            val cv = ContentValues()
+            cv.put(DBController.IS_UPDATED_TO_SERVER, "1")
+            val args = arrayOf(id)
+            val value = db.update(TABLE_LOCATION, cv, ID + " = ?", args)
+
+            Log.e("database","updateLocation: $value")
+
+            //            db.close();
+            return value > 0
+        } catch (ex: java.lang.Exception) {
+            ex.printStackTrace()
+            return false
+        }
     }
 
 

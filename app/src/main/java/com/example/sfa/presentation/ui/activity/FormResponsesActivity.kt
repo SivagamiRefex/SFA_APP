@@ -15,6 +15,7 @@ import com.example.sfa.databinding.ActivityFormResponsesBinding
 import com.example.sfa.presentation.ui.Adapter.CustomFormViewAdapter
 import com.example.sfa.presentation.viewmodel.FormViewModel
 import com.example.sfa.utils.Constant
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.Resource
 import com.example.sfa.utils.SecureStorage
 import com.example.sfa.utils.StringConstants
@@ -43,6 +44,8 @@ class FormResponsesActivity:AppCompatActivity() {
         formViewModel.getFormResponsesListState.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
+                    LoadingUtil.hideLoading()
+
                     if (result.data!!.status) {
 
                         moduleList=result.data.data!!
@@ -56,9 +59,10 @@ class FormResponsesActivity:AppCompatActivity() {
                 }
                 is Resource.Error -> {
                     Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
+                    LoadingUtil.hideLoading()
                 }
                 is Resource.Loading -> {
-                    // Show loading indicator
+                    LoadingUtil.showLoading(this)
                 }
 
             }

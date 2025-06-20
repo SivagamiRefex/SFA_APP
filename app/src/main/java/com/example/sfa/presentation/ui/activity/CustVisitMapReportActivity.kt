@@ -27,6 +27,7 @@ import com.example.sfa.databinding.ActivityCustVisitReportBinding
 import com.example.sfa.presentation.ui.fragment.SelectionBottomSheetFragment
 import com.example.sfa.presentation.viewmodel.ReportVisitViewModel
 import com.example.sfa.utils.Constant
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.Resource
 import com.example.sfa.utils.SecureStorage
 import com.example.sfa.utils.StringConstants
@@ -70,6 +71,7 @@ class CustVisitMapReportActivity:AppCompatActivity(), OnMapReadyCallback {
     var customerLabel:String="Customer"
     private var salespersonList= ArrayList<SalesPersonModel>()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCustVisitMapReportBinding.inflate(layoutInflater)
@@ -96,7 +98,7 @@ class CustVisitMapReportActivity:AppCompatActivity(), OnMapReadyCallback {
         spId=SecureStorage.getString(applicationContext,StringConstants.SP_ID).toString()
         spName=SecureStorage.getString(applicationContext,StringConstants.SP_NAME).toString()
         binding.tvSelectSp.text=spName
-        if(SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE)==2){
+        if(SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE)==2||SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE)==3){
             binding.llSp.visibility  = View.VISIBLE
         }else{
             binding.llSp.visibility  = View.GONE
@@ -170,6 +172,7 @@ class CustVisitMapReportActivity:AppCompatActivity(), OnMapReadyCallback {
         visitViewmodel.getMapListState.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
                         visistedCustList.clear()
                         if(result.data.data!!.size>0){
@@ -219,9 +222,11 @@ class CustVisitMapReportActivity:AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
                     Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Loading -> {
+                    LoadingUtil.showLoading(this)
                     // Show loading indicator
                 }
 
@@ -262,7 +267,13 @@ class CustVisitMapReportActivity:AppCompatActivity(), OnMapReadyCallback {
                 val jsonArray = JSONArray(dataResponse)
                 for (i in 0 until jsonArray.length()) {
                     val jsonObject = jsonArray.getJSONObject(i)
-                    if(!jsonObject.getString("Sp_Id").equals(SecureStorage.getString(applicationContext,StringConstants.SP_ID))) {
+                    //&& !jsonObject.getString("SP_Type").equals("3")
+                    //if(!jsonObject.getString("Sp_Id").equals (SecureStorage.getString(applicationContext,StringConstants.SP_ID))) {
+                    if((SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE)==2 &&
+                                !jsonObject.getString("SP_Type").equals("2")) ||
+                        (SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE)==3&&
+                                jsonObject.getString("Sp_Reporting_To_Id").equals
+                                    (SecureStorage.getString(applicationContext,StringConstants.SP_ID)))){
                         val selectionModel = SalesPersonModel(
                             jsonObject.getString("Sp_Id"),
                             jsonObject.getString("Sp_Name")
@@ -331,14 +342,14 @@ class CustVisitMapReportActivity:AppCompatActivity(), OnMapReadyCallback {
             val origin = visitedPlaces[i]
             val destination = visitedPlaces[i + 1]
 
-            val originLatLong = LatLng(origin.latitude,origin.longitude)
-            val destinationLatLong = LatLng(destination.latitude,destination.longitude)
-            distance+= SphericalUtil.computeDistanceBetween(originLatLong, destinationLatLong);
 
-
-
-            if(distance>0){
-                binding.tvDistance.text=String.format("%.2f", (distance/1000))+" km"
+            if(origin.latitude>0.0&&origin.longitude>0.0&&destination.latitude>0.0&&destination.longitude>0.0){
+                val originLatLong = LatLng(origin.latitude,origin.longitude)
+                val destinationLatLong = LatLng(destination.latitude,destination.longitude)
+                distance+= SphericalUtil.computeDistanceBetween(originLatLong, destinationLatLong);
+                if(distance>0){
+                    binding.tvDistance.text=String.format("%.2f", (distance/1000))+" km"
+                }
             }
 
             val apiKey =getString(R.string.api_key)// "AIzaSyBn9eGybmgpvAp7MXbG1b1i1ODBo0YRruM"

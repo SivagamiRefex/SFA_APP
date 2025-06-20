@@ -69,6 +69,9 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.play.services.maps)
     implementation(libs.places)
+    //implementation(libs.androidx.lifecycle.process)
+    implementation (libs.androidx.lifecycle.extensions)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -79,6 +82,8 @@ dependencies {
     kapt("androidx.hilt:hilt-compiler:1.0.0")
     // Hilt for Navigation (optional)
     implementation("androidx.hilt:hilt-navigation-fragment:1.0.0")
+
+
     implementation(libs.retrofit)
     // Gson converter for Retrofit
     implementation(libs.retrofit2.converter.gson)
@@ -96,6 +101,9 @@ dependencies {
     implementation ("androidx.navigation:navigation-compose:2.5.1")
     implementation (libs.google.maps.services)
     implementation ("com.google.maps.android:android-maps-utils:0.5")
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+  
+
 
 
 

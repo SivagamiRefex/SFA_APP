@@ -15,6 +15,7 @@ import com.google.gson.JsonObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
+import okhttp3.ResponseBody
 import javax.inject.Inject
 @HiltViewModel
 class CustomerViewModel @Inject constructor(
@@ -24,6 +25,8 @@ class CustomerViewModel @Inject constructor(
 
     private val _saveCustState = MutableLiveData<Resource<BaseRespWithoutData>>()
     val saveCustState: LiveData<Resource<BaseRespWithoutData>> =_saveCustState
+
+
 
     fun saveCustomer(token:String,data:JsonObject){
         viewModelScope.launch {
@@ -35,33 +38,13 @@ class CustomerViewModel @Inject constructor(
         }
     }
 
-    /*fun saveCustomer(token: String, data: JsonObject) {
-        viewModelScope.launch {
-            _saveCustState.value = Resource.Loading()
-            val response = repository.saveCustomer(token, data)
-            if (response.isSuccessful) {
-                _saveCustState.value = Resource.Success(response.body())
-            } else {
-                _saveCustState.value = Resource.Error("APII Error: ${response.message()}")
-            }
-        }
+     suspend  fun getCustomer(token: String, data: JsonObject, ): Resource<ResponseBody> {
+       // viewModelScope.launch {
+
+            return repository.getCustomer(token, data)
+       // }
     }
 
-    fun saveCustomer(token: String, data: JsonObject) {
-        viewModelScope.launch {
-            _saveCustState.value = Resource.Loading()
-            try {
-                val response = repository.saveCustomer(token, data)
 
-                if (response.status) {
-                    _saveCustState.value = Resource.Success(response)
-                } else {
-                    _saveCustState.value = Resource.Error("API Error: ${response.message}")
-                }
-            } catch (e: Exception) {
-                _saveCustState.value = Resource.Error("Network Error: ${e.localizedMessage}")
-            }
-        }
-    }*/
 
 }

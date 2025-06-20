@@ -31,6 +31,12 @@ class TaskViewModel @Inject constructor(
     private val _getctState = MutableLiveData<Resource<BaseResponse<ArrayList<TaskModel>>>>()
     val getctState: LiveData<Resource<BaseResponse<ArrayList<TaskModel>>>> = _getctState
 
+    private val _gettftState = MutableLiveData<Resource<BaseResponse<ArrayList<TaskModel>>>>()
+    val gettftState: LiveData<Resource<BaseResponse<ArrayList<TaskModel>>>> = _gettftState
+
+    private val _getuftState = MutableLiveData<Resource<BaseResponse<ArrayList<TaskModel>>>>()
+    val getuftState: LiveData<Resource<BaseResponse<ArrayList<TaskModel>>>> = _getuftState
+
 
     fun saveTask(token: String, data: JsonObject) {
         viewModelScope.launch {
@@ -57,6 +63,26 @@ class TaskViewModel @Inject constructor(
             _getctState.value = Resource.Loading()
             val result = repository.getCompleteTask(token,spId,date,spType)
             _getctState.value = result
+
+
+        }
+    }
+
+    fun getTodayFollowupTask(token: String,spId:String,date: String,spType:Int){
+        viewModelScope.launch {
+            _gettftState.value = Resource.Loading()
+            val result = repository.getTodayFollowupTask(token,spId,date,spType)
+            _gettftState.value = result
+
+
+        }
+    }
+
+    fun getUpcomingFollowupTask(token: String,spId:String,date: String,spType:Int){
+        viewModelScope.launch {
+            _getuftState.value = Resource.Loading()
+            val result = repository.getUpcomingFollowupTask(token,spId,date,spType)
+            _getuftState.value = result
 
 
         }

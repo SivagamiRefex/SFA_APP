@@ -17,7 +17,10 @@ data class TaskModel(@SerializedName("Task_Id") val taskId:String,
                      @SerializedName("Route_Name")  val routeName:String,
                      @SerializedName("Start_Date")  val taskSrtDate:String,
                      @SerializedName("Task_Detail")  val taskDetail:String,
-                     @SerializedName("Completed_Date") var completeDt: String = "") {
+                     @SerializedName("Completed_Date") var completeDt: String = "",
+                     @SerializedName("check_in_time") var checkInTime: String = "",
+                     @SerializedName("check_out_time") var checkOutTime: String = "",
+                     @SerializedName("followup_date") var followupDate: String = "") {
 
 
 }

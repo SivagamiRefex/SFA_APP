@@ -39,7 +39,7 @@ class AssignedTaskActivity:AppCompatActivity() {
     }
     private fun setupViewPager(viewpager: ViewPager) {
         var adapter = ViewPagerAdapter(supportFragmentManager)
-        adapter.addFragment(PendingTaskFragment(), "Pending")
+        adapter.addFragment(PendingTaskFragment(), "Open")
         adapter.addFragment(CompletedTaskFragment(), "Completed")
         viewpager.setAdapter(adapter)
     }

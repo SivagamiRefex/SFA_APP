@@ -23,6 +23,7 @@ import com.example.sfa.presentation.ui.listener.OnTaskClickListener
 import com.example.sfa.presentation.viewmodel.MydayplanViewModel
 import com.example.sfa.presentation.viewmodel.TaskViewModel
 import com.example.sfa.utils.Constant
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.Resource
 import com.example.sfa.utils.SecureStorage
 import com.example.sfa.utils.StringConstants
@@ -63,9 +64,9 @@ class PendingTaskFragment: Fragment() {
         taskViewModel.getpdState.observe(requireActivity()) { result ->
             when (result) {
                 is Resource.Success -> {
-
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
-                        Toast.makeText(requireContext(), "Pending Task List Updated", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Open Task List Updated", Toast.LENGTH_SHORT).show()
                         taskList= result.data.data!!
                         pendingTaskAdapter.setList(taskList)
                        // checkSwitchPlanNd(taskList)
@@ -77,10 +78,12 @@ class PendingTaskFragment: Fragment() {
                 }
 
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
                     Toast.makeText(requireContext(), result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
 
                 is Resource.Loading -> {
+                    LoadingUtil.showLoading(requireContext())
                     // Show loading indicator
                 }
 
@@ -89,7 +92,7 @@ class PendingTaskFragment: Fragment() {
         mydayplanViewModel.saveMydayplanState.observe(requireActivity()) { result ->
             when (result) {
                 is Resource.Success -> {
-
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
                         Toast.makeText(requireContext(), "Mydayplan Saved Successfully", Toast.LENGTH_SHORT).show()
                         taskViewModel.getPendingTask(
@@ -102,14 +105,16 @@ class PendingTaskFragment: Fragment() {
                         Toast.makeText(requireContext(), result.data!!.message, Toast.LENGTH_SHORT).show()
                     }
 
+
                 }
 
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
                     Toast.makeText(requireContext(), result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
 
                 is Resource.Loading -> {
-                    // Show loading indicator
+                    LoadingUtil.showLoading(requireContext())
                 }
 
             }
@@ -117,7 +122,7 @@ class PendingTaskFragment: Fragment() {
         mydayplanViewModel.cancelMydayplanState.observe(requireActivity()) { result ->
             when (result) {
                 is Resource.Success -> {
-
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
                         Toast.makeText(requireContext(), result.data!!.message, Toast.LENGTH_SHORT).show()
                         taskViewModel.getPendingTask(
@@ -133,10 +138,12 @@ class PendingTaskFragment: Fragment() {
                 }
 
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
                     Toast.makeText(requireContext(), result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
 
                 is Resource.Loading -> {
+                    LoadingUtil.showLoading(requireContext())
                     // Show loading indicator
                 }
 
@@ -168,7 +175,14 @@ class PendingTaskFragment: Fragment() {
 
         binding.tvTaskName.text = selectionModel.taskName
         binding.tvEndDate.text =selectionModel.taskEndDt
-        binding.tvStatus.text = if(selectionModel.taskstatus==0) "Pending" else if(selectionModel.taskstatus==1) "In Progress" else "Completed"
+        binding.tvStatus.text =  if(!TimesUtil.isFirstDateBeforeSecond(TimesUtil.getCurrentTime(
+                TimesUtil.FORMAT1),selectionModel.taskEndDt) &&
+            selectionModel.taskstatus==0 &&
+            !TimesUtil.getCurrentTime(TimesUtil.FORMAT1).
+            equals(selectionModel.taskEndDt)) "Overdue"
+        else if(selectionModel.taskstatus==0) "Open"
+        else if(selectionModel.taskstatus==1) "Working"
+        else "Completed"
         binding.tvRoute.text = selectionModel.routeName
         binding.tvCustomer.text = selectionModel.custNm
         binding.tvCustomerAddr.text=selectionModel.custAddress

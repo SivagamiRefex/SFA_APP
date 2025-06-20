@@ -16,6 +16,7 @@ import com.example.sfa.databinding.ActivityFormCreationBinding
 import com.example.sfa.presentation.ui.Adapter.SectionFormAdapter
 import com.example.sfa.presentation.viewmodel.FormViewModel
 import com.example.sfa.utils.Constant
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.Resource
 import com.example.sfa.utils.SecureStorage
 import com.example.sfa.utils.StringConstants
@@ -83,6 +84,7 @@ class FormCreationActivity:AppCompatActivity() {
         formViewModel.saveCreationformState.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
+                    LoadingUtil.hideLoading()
 
                     if (result.data!!.status) {
                         Toast.makeText(applicationContext, result.data!!.message, Toast.LENGTH_SHORT).show()
@@ -95,10 +97,14 @@ class FormCreationActivity:AppCompatActivity() {
                 }
 
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
+
                     Toast.makeText(applicationContext, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
 
                 is Resource.Loading -> {
+                    LoadingUtil.showLoading(this)
+
                     // Show loading indicator
                 }
 

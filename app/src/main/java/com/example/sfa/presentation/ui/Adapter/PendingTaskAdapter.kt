@@ -42,7 +42,47 @@ class PendingTaskAdapter (private var context: Context, private var taskList: Ar
         if(SecureStorage.getInt(context,StringConstants.SP_TYPE)==2){
             holder.binding.tvAssignedTo.visibility=View.VISIBLE
             holder.binding.btnMydayplan.visibility=View.GONE
-        }else{
+        }else if(SecureStorage.getInt(context,StringConstants.SP_TYPE)==3){
+           if( (SecureStorage.getString(context,StringConstants.SP_ID)!!).equals(task.spId)) {
+               holder.binding.tvAssignedTo.visibility = View.VISIBLE
+               holder.binding.btnMydayplan.visibility = View.VISIBLE
+
+               if (task.taskstatus == 1) {
+                   holder.binding.tvStatus.visibility = View.GONE
+                   holder.binding.btnMydayplan.text = "Cancel"
+                   (holder.binding.root as CardView).setCardBackgroundColor(
+                       ContextCompat.getColor(
+                           context,
+                           R.color.light_report_header
+                       )
+                   )
+                   holder.binding.btnMydayplan.visibility = View.VISIBLE
+               } else if (task.taskstatus == 2) {
+                   holder.binding.tvStatus.visibility = View.VISIBLE
+                   (holder.binding.root as CardView).setCardBackgroundColor(
+                       ContextCompat.getColor(
+                           context,
+                           R.color.light_yellow
+                       )
+                   )
+                   holder.binding.btnMydayplan.visibility = View.GONE
+               } else {
+                   holder.binding.btnMydayplan.text = "Mydayplan"
+                   (holder.binding.root as CardView).setCardBackgroundColor(
+                       ContextCompat.getColor(
+                           context,
+                           R.color.white
+                       )
+                   )
+                   holder.binding.tvStatus.visibility = View.GONE
+                   holder.binding.btnMydayplan.visibility = View.VISIBLE
+               }
+           }else{
+               holder.binding.tvAssignedTo.visibility=View.VISIBLE
+               holder.binding.btnMydayplan.visibility=View.GONE
+           }
+
+        }else {
             holder.binding.tvAssignedTo.visibility=View.GONE
             if(task.taskstatus==1) {
                 holder.binding.tvStatus.visibility = View.GONE

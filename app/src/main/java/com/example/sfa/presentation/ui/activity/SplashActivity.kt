@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.sfa.R
 import com.example.sfa.databinding.ActivitySplashBinding
+import com.example.sfa.utils.DeveloperOptionUtil
 import com.example.sfa.utils.SecureStorage
 import com.example.sfa.utils.StringConstants
 import com.example.sfa.utils.TimesUtil
@@ -21,6 +22,13 @@ class SplashActivity:AppCompatActivity() {
     }
     fun initView(){
         Glide.with(this).load(R.drawable.sfa_gif).into(binding.ivGif)
+
+       /* if (DeveloperOptionUtil.isDeveloperOptionsEnabled(this)) {
+            DeveloperOptionUtil.showDeveloperOptionsAlert(this)
+        }else {
+            navigateToDashboard()
+        }*/
+
         navigateToDashboard()
     }
 

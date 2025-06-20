@@ -6,6 +6,7 @@ import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.widget.AdapterView
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -19,6 +20,7 @@ import com.example.sfa.databinding.ActivityCustomFormBinding
 import com.example.sfa.presentation.ui.Adapter.CustomFormAdapter
 import com.example.sfa.presentation.viewmodel.FormViewModel
 import com.example.sfa.utils.Constant
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.LocationProvider
 import com.example.sfa.utils.PermissionUtil
 import com.example.sfa.utils.Resource
@@ -39,7 +41,9 @@ class CustomFormOneActivity:AppCompatActivity() {
     private var inLatitude = "0"
     private var inLongitude = "0"
     private var clocation: Location? = null
-    private var type = 0
+    private var screenType = 0
+    private var screenFrom="visit"
+    private var checkInId=""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCustomFormBinding.inflate(layoutInflater)
@@ -58,13 +62,15 @@ class CustomFormOneActivity:AppCompatActivity() {
             customerName = it.getString("customerNm", "")
             inLatitude = it.getString("latitude", "0")
             inLongitude = it.getString("longitude", "0")
-            type = it.getInt("type", 0)
+            screenType = it.getInt("type", 0)
+            screenFrom=it.getString("from","visit")
+            checkInId=it.getString("checkInId","")
 
         }
 
 
-        val spType = SecureStorage.getString(applicationContext, StringConstants.SP_ID)
-        if (spType == "2" && type == 0) {
+        val spType = SecureStorage.getInt(applicationContext, StringConstants.SP_TYPE)
+        if (((spType == 2 ||spType == 3) && screenType == 0 )||(Constant.getSetup("geofenc_need",0,dbController,this)==1)) {
             getAssignedCustomModuleList()
         } else {
             getCurrentLocation()
@@ -74,6 +80,7 @@ class CustomFormOneActivity:AppCompatActivity() {
         formViewModel.getFormListState.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
 
                         moduleList=result.data.data!!
@@ -86,9 +93,11 @@ class CustomFormOneActivity:AppCompatActivity() {
                     }
                 }
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
                     Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Loading -> {
+                    LoadingUtil.showLoading(this)
                     // Show loading indicator
                 }
 
@@ -104,9 +113,9 @@ class CustomFormOneActivity:AppCompatActivity() {
             locationProvider.getCurrentLocation { location ->
                 if (location != null) {
                     clocation=location
-                    val radius = 50.0
+                    val radius = 100.0
                     val meters: Double = Constant.meterDistanceBetweenPoints(
-                        java.lang.Double.parseDouble(inLongitude),
+                        java.lang.Double.parseDouble(inLatitude),
                         java.lang.Double.parseDouble(inLongitude),
                         Constant.getLatitude(clocation),
                         Constant.getLongitude(clocation)
@@ -114,7 +123,7 @@ class CustomFormOneActivity:AppCompatActivity() {
                     if (meters <= radius) {
                         getAssignedCustomModuleList()
                     } else {
-                       getAssignedCustomModuleList()
+                     //  getAssignedCustomModuleList()
                         Toast.makeText(applicationContext, "You are not in range.So can't view details ", Toast.LENGTH_SHORT).show()
                     }
                 } else {
@@ -131,7 +140,7 @@ class CustomFormOneActivity:AppCompatActivity() {
             jsonObject.addProperty("spId",  SecureStorage.getString(applicationContext,StringConstants.SP_ID)!!)
             jsonObject.addProperty("spType", SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE))
             jsonObject.addProperty("custId", customerId)
-            jsonObject.addProperty("type", type)
+            jsonObject.addProperty("type", screenType)
             formViewModel.getFormList(SecureStorage.getString(applicationContext,StringConstants.AUTH_TOKEN)!!,jsonObject)
 
         }else{
@@ -150,6 +159,10 @@ class CustomFormOneActivity:AppCompatActivity() {
                 putExtra("moduleName", module.moduleName)
                 putExtra("title", module.moduleName)
                 putExtra("custId", customerId)
+                putExtra("screenType",screenType)
+                Log.e("screenType",""+screenType)
+                putExtra("screenFrom",screenFrom)
+                putExtra("checkInId",checkInId)
             }
             startActivity(intent)
 

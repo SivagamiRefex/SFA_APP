@@ -39,7 +39,7 @@ class CompleteTaskAdapter(private var context: Context, private var taskList: Ar
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         val task = taskList[position]
-        if(SecureStorage.getInt(context, StringConstants.SP_TYPE)==2){
+        if(SecureStorage.getInt(context, StringConstants.SP_TYPE)==2 ||SecureStorage.getInt(context, StringConstants.SP_TYPE)==3){
             holder.binding.tvAssignedTo.visibility= View.VISIBLE
         }else{
             holder.binding.tvAssignedTo.visibility= View.GONE

@@ -1,22 +1,19 @@
 package com.example.sfa.presentation.ui.activity
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.sampleapp.model.CustomerDataViewModel
+import com.example.sfa.data.model.CustomerDataModel
 import com.example.sampleapp.sqlite.DBController
 import com.example.sfa.R
 import com.example.sfa.data.model.AssignFormModel
 import com.example.sfa.data.model.SalesPersonModel
 import com.example.sfa.data.model.SelectionModel
-import com.example.sfa.databinding.ActivityAddcustomerBinding
 import com.example.sfa.databinding.ActivityAssignFormBinding
 import com.example.sfa.presentation.ui.Adapter.AssignCustomerAdapter
 import com.example.sfa.presentation.ui.Adapter.AssignSalesmanAdapter
@@ -24,6 +21,7 @@ import com.example.sfa.presentation.ui.fragment.SelectionBottomSheetFragment
 import com.example.sfa.presentation.ui.listener.OnClickTypeListener
 import com.example.sfa.presentation.viewmodel.FormViewModel
 import com.example.sfa.utils.Constant
+import com.example.sfa.utils.LoadingUtil
 import com.example.sfa.utils.Resource
 import com.example.sfa.utils.SecureStorage
 import com.example.sfa.utils.StringConstants
@@ -47,7 +45,7 @@ class AssignFormActivity:AppCompatActivity() {
     private  var unAssignedPersonList= ArrayList<SelectionModel>()
     private  var commonSalespersonList= ArrayList<SelectionModel>()
     private  var commonCustomerList= ArrayList<SelectionModel>()
-    private var customerList= ArrayList<CustomerDataViewModel>()
+    private var customerList= ArrayList<CustomerDataModel>()
     private var filteredCustomerList = ArrayList<SelectionModel>()
     private  var unAssignedCustomerList= ArrayList<SelectionModel>()
     private var assignModuleList = ArrayList<AssignFormModel>()
@@ -131,6 +129,7 @@ class AssignFormActivity:AppCompatActivity() {
         formViewModel.getFormWithAssigneeState.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
+                    LoadingUtil.hideLoading()
                     if (result.data!!.status) {
 
                         assignModuleList=result.data.data!!
@@ -153,12 +152,17 @@ class AssignFormActivity:AppCompatActivity() {
                     } else {
                         Toast.makeText(applicationContext, result.data!!.message, Toast.LENGTH_SHORT).show()
                     }
+
                 }
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
+
                     Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Loading -> {
                     // Show loading indicator
+                    LoadingUtil.showLoading(this)
+
                 }
 
             }
@@ -167,6 +171,8 @@ class AssignFormActivity:AppCompatActivity() {
         formViewModel.saveFormAssigneeState.observe(this) { result ->
             when (result) {
                 is Resource.Success -> {
+                    LoadingUtil.hideLoading()
+
                     if (result.data!!.status) {
                         Toast.makeText(applicationContext, result.data!!.message, Toast.LENGTH_SHORT).show()
                         finish()
@@ -175,10 +181,13 @@ class AssignFormActivity:AppCompatActivity() {
                     }
                 }
                 is Resource.Error -> {
+                    LoadingUtil.hideLoading()
+
                     Toast.makeText(this, result.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Loading -> {
                     // Show loading indicator
+                    LoadingUtil.showLoading(this)
                 }
 
             }
@@ -282,8 +291,15 @@ class AssignFormActivity:AppCompatActivity() {
 
                 for (i in 0 until jsonArray.length()) {
                     val jsonObject = jsonArray.getJSONObject(i)
-
-                    if(!jsonObject.getString("Sp_Id").equals(SecureStorage.getString(applicationContext,StringConstants.SP_ID))){
+//!jsonObject.getString("SP_Type").equals("3")
+                   // if(!jsonObject.getString("Sp_Id").equals(SecureStorage.getString(applicationContext,StringConstants.SP_ID))){
+                    if((SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE)==2 &&
+                                !jsonObject.getString("SP_Type").equals("2")) ||
+                        (SecureStorage.getInt(applicationContext,StringConstants.SP_TYPE)==3&&
+                                (jsonObject.getString("Sp_Reporting_To_Id").equals(
+                                    SecureStorage.getString(applicationContext,StringConstants.SP_ID))||
+                                        SecureStorage.getString(applicationContext,StringConstants.SP_ID).
+                                        equals(jsonObject.getString("Sp_Id"))))){
                         val selectionModel: SelectionModel = SelectionModel(
                             jsonObject.getString("Sp_Id"),
                             jsonObject.getString("Sp_Name"))
@@ -329,7 +345,7 @@ class AssignFormActivity:AppCompatActivity() {
                     selectionModel.long=jsonObject.getString("Loc_Longitude").toDouble()
                     commonCustomerList.add(selectionModel)
 
-                    val selectionModel1 = CustomerDataViewModel(
+                    val selectionModel1 = CustomerDataModel(
                         jsonObject.getString("Cust_Id"),
                         jsonObject.getString("Cust_Name"),
                         jsonObject.getString("Cust_Billing_Address"),
@@ -479,7 +495,7 @@ class AssignFormActivity:AppCompatActivity() {
         }
 
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Select the Sales Person")
+        builder.setTitle("Select the Salesperson")
 
 
         builder.setMultiChoiceItems(

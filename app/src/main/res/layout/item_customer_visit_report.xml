@@ -56,7 +56,6 @@
             android:textColor="@color/dark_blue"
             android:layout_weight="1"
             />
-
                 <TextView
                     android:id="@+id/tv_outtime"
                     android:layout_width="0dp"
@@ -79,6 +78,18 @@
                     android:gravity="end"/>
 
             </LinearLayout>
+            <TextView
+                android:id="@+id/tv_activity_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Activity Status"
+                android:textSize="17sp"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:textStyle="bold"
+                android:padding="5dp"
+                android:textColor="@color/green" />
+
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
